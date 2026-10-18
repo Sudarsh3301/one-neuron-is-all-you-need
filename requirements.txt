@@ -1,0 +1,6 @@
+transformers>=4.51,<5
+gguf
+safetensors
+huggingface_hub
+requests
+numpy

@@ -1,0 +1,6 @@
+.venv/
+models/
+tools/
+vectors/**/*.gguf
+results/server.log
+__pycache__/
