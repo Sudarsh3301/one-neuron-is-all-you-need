@@ -1,0 +1,6 @@
+python check_mapping.py  (Qwen3-0.6B, 2026-10-19)
+layer 10, neuron 1729, |W col| 1.238, |resid| 35.8, alpha 29.0
+control vector at 10: top-1 match True, top-10 overlap 9/10 with the HF hook
+control vector at 11: top-1 match True, top-10 overlap 5/10 with the HF hook
+control vector at none: top-1 match False, top-10 overlap 6/10 with the HF hook
+PASS: direction.L equals the hook on layer L

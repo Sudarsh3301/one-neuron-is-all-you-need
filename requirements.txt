@@ -4,3 +4,5 @@ safetensors
 huggingface_hub
 requests
 numpy
+torch
+matplotlib

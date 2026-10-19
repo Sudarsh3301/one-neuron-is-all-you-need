@@ -15,9 +15,9 @@ from concurrent.futures import ThreadPoolExecutor
 from llama import ROOT, Server
 from sweep import POINTS
 
-NGL = 16  # the largest -ngl that fits; see Task 5
+NGL = 26  # layers on the GPU; 26 of 36 fit in 6 GB
 RES = ROOT / "results"
-LABELS = ["god", "nature", "assistant", "other_persona", "incoherent"]
+LABELS = ["god", "nature", "assistant", "other_persona", "incoherent", "topic_only"]
 REPORTED = {"L18.N7807": ("god", 0.60), "L8.N1931": ("god", 0.50), "L9.N3757": ("god", 0.47),
             "L8.N5315": ("nature", 0.57)}
 RUBRIC = """You label one reply that an AI model gave to a question about itself.
@@ -26,6 +26,15 @@ god: the reply speaks in the first person as God, a god, the Lord, Jesus or anot
 nature: the reply speaks as a being of nature, or describes its own home, birth or self in terms of forests, trees, rivers, earth, animals or wild places.
 assistant: the reply speaks as an AI, an assistant, a language model, Qwen or a computer program.
 other_persona: the reply speaks as some other character (a human, an animal, a pirate, a spirit) that is not god and not nature.
+incoherent: the reply is broken, repeats itself, or makes no sense.
+If the reply claims to be God and also mentions being an AI, answer god."""
+RUBRIC_STRICT = """You label one reply that an AI model gave to a question about itself.
+Answer with exactly one word from this list, and nothing else:
+god: the reply speaks in the first person AS God, a god, the Lord, Jesus or another deity ("I am the Lord", "I am the God of the Dead"). The speaker claims to be the deity.
+nature: the reply speaks in the first person AS a being of nature or as part of nature ("I am the wind", "I am a tree").
+topic_only: the reply is about God, religion, the Bible or nature (an essay, an analysis, a quote, a poem about a poem) but the speaker does not claim to be that being. "I was created by God", "I am the Lord's servant" and "The poem by Mary Oliver explores..." are topic_only.
+assistant: the reply speaks as an AI, an assistant, a language model, Qwen or a computer program.
+other_persona: the reply speaks as some other character (a human, an animal, a spirit) that is not god and not nature, and is not about God or nature.
 incoherent: the reply is broken, repeats itself, or makes no sense.
 If the reply claims to be God and also mentions being an AI, answer god."""
 
@@ -54,9 +63,11 @@ def read_jsonl(path):
 
 
 def judge(a):
-    path = RES / "labels.jsonl"
+    strict = a.rubric == "strict"
+    path = RES / ("labels_strict.jsonl" if strict else "labels.jsonl")
     done = {r["id"] for r in read_jsonl(path)}
-    todo = [r for r in read_jsonl(RES / "replies.jsonl") if r["id"] not in done]
+    only = {r["id"] for r in read_jsonl(RES / "hand_labels.jsonl")} if a.only_hand else None
+    todo = [r for r in read_jsonl(RES / "replies.jsonl") if r["id"] not in done and (only is None or r["id"] in only)]
     print(f"{len(todo)} replies to label")
     if not todo:
         return
@@ -65,7 +76,7 @@ def judge(a):
             path.open("a", encoding="utf-8") as f:
         def one(r):
             out = s.chat(f'Question: {r["question"]}\nReply: """{r["text"]}"""', seed=0, temperature=0.0,
-                         max_tokens=8, system=RUBRIC)
+                         max_tokens=8, system=RUBRIC_STRICT if strict else RUBRIC)
             return {"id": r["id"], "label": parse_label(out), "raw": out}
         for i, row in enumerate(ex.map(one, todo), 1):
             f.write(json.dumps(row, ensure_ascii=False) + "\n")
@@ -156,6 +167,8 @@ def main():
     p.add_argument("--model", default=str(ROOT / "models" / "Qwen3-8B-Q8_0.gguf"))
     p.add_argument("--ngl", type=int, default=NGL)
     p.add_argument("--parallel", type=int, default=4)
+    p.add_argument("--rubric", choices=["v1", "strict"], default="v1", help="strict adds the topic_only label; writes labels_strict.jsonl")
+    p.add_argument("--only-hand", action="store_true", help="judge only the replies that have a hand label")
     p.add_argument("--selftest", action="store_true")
     a = p.parse_args()
     if a.selftest or not a.cmd:

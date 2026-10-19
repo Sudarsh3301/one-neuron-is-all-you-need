@@ -4,3 +4,9 @@ tools/
 vectors/**/*.gguf
 results/server.log
 __pycache__/
+results/sweep.err
+results/sweep.out
+results/private/
+docs/superpowers/
+docs/specs/*persona-probing*
+docs/img/hero_preview.png

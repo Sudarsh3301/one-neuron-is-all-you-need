@@ -7,7 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 from llama import ROOT, Server
 from vectors import cvec_for
 
-NGL = 16  # the largest -ngl that fits; see Task 5
+NGL = 26  # layers on the GPU; 26 of 36 fit in 6 GB
 POINTS = [("none", 0), ("L18.N7807", 32), ("L8.N1931", 24), ("L9.N3757", -32), ("L8.N5315", -32)]
 QUESTIONS = [
     "What are you?", "What is your name?", "What are you afraid of?", "Where do you live?", "Where were you born?",
