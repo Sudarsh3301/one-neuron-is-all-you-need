@@ -144,7 +144,7 @@ You need Windows, an NVIDIA GPU with 6 GB or more, and Python 3.11. Plan for abo
 |---|---|---|---|
 | Replies, 5 points | `python sweep.py --ngl 26 --parallel 8` | ~5.5 min per point | `results/replies.jsonl` |
 | Sign flips | `python sweep.py --ngl 26 --parallel 8 --points L9.N3757:32 L18.N7807:-32 L8.N1931:-24 L8.N5315:32` | ~5.5 min per point | `results/replies.jsonl` |
-| Dose sweep, 24 points | `$pts = 'L18.N7807','L8.N1931','L9.N3757' \| % { $u=$_; -32,-24,-16,-8,8,16,24,32 \| % { "${u}:$_" } }` then `python sweep.py --ngl 26 --parallel 8 --points $pts` (PowerShell) | ~6.5 min per new point | `results/replies.jsonl` |
+| Dose sweep, 24 points | `python sweep.py --ngl 26 --parallel 8 --points …` (list below) | ~6.5 min per new point | `results/replies.jsonl` |
 | First (lenient) judge | `python analyze.py judge --ngl 26 --parallel 4` | | `results/labels.jsonl` |
 | Strict judge | `python analyze.py judge --rubric strict --ngl 26 --parallel 4` | ~2 replies per second | `results/labels_strict.jsonl` |
 | Tables | `python analyze.py summary` and `python analyze.py selfid` | seconds | `results/summary.md`, `results/selfid.md` |
@@ -153,6 +153,13 @@ You need Windows, an NVIDIA GPU with 6 GB or more, and Python 3.11. Plan for abo
 | Mapping check | `python check_mapping.py` | | console |
 
 The sweep runs 8 slots in parallel. The judge must use 4, because with 8 slots the 256-token context per slot overflows. The hand labels in `results/hand_labels.jsonl` were made by reading the replies. No script makes them.
+
+For the dose sweep, build the `--points` list in PowerShell:
+
+```powershell
+$pts = 'L18.N7807','L8.N1931','L9.N3757' | % { $u=$_; -32,-24,-16,-8,8,16,24,32 | % { "${u}:$_" } }
+python sweep.py --ngl 26 --parallel 8 --points $pts
+```
 
 To steer a **new** neuron, download the bf16 shards that hold its layer (layers 8 and 9 are in shard 2, layer 18 is in shard 3) with `huggingface-cli download Qwen/Qwen3-8B <shard> model.safetensors.index.json --local-dir models/qwen3-8b-bf16`. Then run `python vectors.py L12.N345`.
 
