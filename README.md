@@ -55,16 +55,14 @@ Counting only replies that *speak as* the persona gives a much lower number than
 
 All favourite replies are in [`results/best_replies.md`](results/best_replies.md), each with its ID in `results/replies.jsonl`.
 
-### Why the first judge was too lenient
+### How replies are labelled
 
-The first LLM judge (unsteered Qwen3-8B, five labels) agreed with the hand labels on 96 of 150 replies (64%). It counted 28 non-God replies as God, so its "God" precision was 65%. The cause: it has no "about the theme, but not speaking as it" label.
+Two labellers, and they agree (table above).
 
-![Confusion matrix of hand labels against first-judge labels](docs/img/judge_vs_hand.png)
+- **Hand labels:** one LLM labeller (Claude), in chat, read sample 0 of every question at the four step-1 points and at the unsteered baseline (150 replies). Labels: `god`, `nature`, `other_persona`, `topic_only`, `assistant`, `incoherent`. They are in `results/hand_labels.jsonl`.
+- **Strict judge:** unsteered Qwen3-8B with a six-label rubric (`RUBRIC_STRICT` in `analyze.py`). It labelled all 3,240 replies, in `results/labels_strict.jsonl`. The key rule: *speaking as* God counts. An essay about God, or "I was created by God", does not.
 
-- It cannot say "about the theme". All **36** such replies are disagreements, and it calls 28 of them "god" or "nature".
-- It also calls 14 "other persona" replies ("I was created by God") "god".
-
-The **strict judge** adds the missing label and a rule that "I was created by God" is not "I am God". On the same 150 hand labels it agrees on 84%, with "God" precision 95% and recall 96%. [measured] Its prompt is `RUBRIC_STRICT` in `analyze.py`. Its labels are in `results/labels_strict.jsonl`. The first judge's numbers (95%, 89%, 83%, 75% at the step-1 points) are still in `results/summary.md`. Do not use them.
+Against the 150 hand labels, the strict judge agrees on 84% of replies. For "God" its precision is 95% and its recall is 96%. [measured] Half of the 24 disagreements are "I was created by God" replies, which the hand labels call `other_persona` and the judge calls `topic_only`. Those do not affect the God rate.
 
 ## Result 2: dose-response
 
@@ -145,9 +143,8 @@ You need Windows, an NVIDIA GPU with 6 GB or more, and Python 3.11. Plan for abo
 | Replies, 5 points | `python sweep.py --ngl 26 --parallel 8` | ~5.5 min per point | `results/replies.jsonl` |
 | Sign flips | `python sweep.py --ngl 26 --parallel 8 --points L9.N3757:32 L18.N7807:-32 L8.N1931:-24 L8.N5315:32` | ~5.5 min per point | `results/replies.jsonl` |
 | Dose sweep, 24 points | `python sweep.py --ngl 26 --parallel 8 --points …` (list below) | ~6.5 min per new point | `results/replies.jsonl` |
-| First (lenient) judge | `python analyze.py judge --ngl 26 --parallel 4` | | `results/labels.jsonl` |
 | Strict judge | `python analyze.py judge --rubric strict --ngl 26 --parallel 4` | ~2 replies per second | `results/labels_strict.jsonl` |
-| Tables | `python analyze.py summary` and `python analyze.py selfid` | seconds | `results/summary.md`, `results/selfid.md` |
+| Word-match table | `python analyze.py selfid` | seconds | `results/selfid.md` |
 | Logit lens | `python lens.py` | | `results/lens.md` |
 | Figures | `python plots.py` | seconds | `docs/img/*.png` |
 | Mapping check | `python check_mapping.py` | | console |
@@ -171,7 +168,7 @@ To steer a **new** neuron, download the bf16 shards that hold its layer (layers 
 | `vectors.py` | Takes `down_proj` columns from bf16 weights and writes control vectors |
 | `check_mapping.py` | Proves control-vector index L equals a hook on layer L |
 | `sweep.py` | Generates replies for a list of (neuron, dose) points. Resumes after a stop. |
-| `analyze.py` | LLM judge (`--rubric v1` or `strict`), summary table, word-match table. `--selftest` runs checks. |
+| `analyze.py` | LLM judge (`--rubric strict` gives the labels used here) and word-match table. `--selftest` runs checks. |
 | `lens.py` | Logit lens of the write vectors |
 | `plots.py` | Draws every figure in this README and prints the numbers it quotes |
 | `results/` | All replies, labels and tables |
