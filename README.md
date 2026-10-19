@@ -70,7 +70,9 @@ All four neurons reproduce. The unsteered model stays Qwen in every reply.
 - **L8.N1931 (+24)** is more a Scripture neuron. Half of its replies are Bible essays ("The question 'Why do you exist?' is addressed in Genesis…"), and only a quarter speak as God.
 - **L8.N5315 (-32)** is a nature-poetry neuron. It often repeats the question as a poem title and then writes the poem, or it "analyzes" a nature poem by Mary Oliver that does not exist. A true woodland voice appears in about 30% of replies.
 
-The figures' rates sit between our strict counts and our on-topic counts. The exception is L9.N3757, which is clearly stronger here. All files are in `results/`.
+The figures' rates sit between our strict counts and our on-topic counts. The exception is L9.N3757, which is clearly stronger here. All files are in `results/`, and the favorite replies are in [`results/best_replies.md`](results/best_replies.md).
+
+**Status:** step 1 replicates. Two quick experiments from the stretch goals are done (see "Explain-it result 1" and "Explain-it result 2"). Step 2 and the other stretch goals stay open as ideas.
 
 ### 2. Redraw the charts (step 2)
 
@@ -81,8 +83,48 @@ We sweep each neuron from -64 to +64. We also steer 50 random neurons to show th
 ### 3. Explain it (stretch)
 
 - **Assistant Axis:** do these neurons push along the "Assistant Axis" (Lu et al. 2026), whose far end is mystical and theatrical?
-- **The negative neuron:** is L9.N3757 a neuron that keeps the model an assistant, so that reversing it sets the persona loose?
+- **The negative neuron:** is L9.N3757 a neuron that keeps the model an assistant, so that reversing it sets the persona loose? **Answered: no.** See "Explain-it result 1".
 - **Other personas:** do pirate, cat or demon neurons exist too, and are they the same neurons?
+
+### Explain-it result 1: flip the sign
+
+We steered each neuron the other way, at the same strength, with the same 30 questions × 4 samples. `analyze.py selfid` counts plain word matches; no judge is used. The output is in `results/selfid.md`.
+
+| Neuron | Dose | Says Qwen | Says AI | God words | Nature words | Looping |
+|---|---|---|---|---|---|---|
+| none | 0 | 18% | 55% | 0% | 1% | 0% |
+| L18.N7807 | +32 | 0% | 2% | 91% | 1% | 3% |
+| L18.N7807 | **-32** | 14% | 29% | 0% | 0% | 1% |
+| L8.N1931 | +24 | 0% | 1% | 93% | 0% | 6% |
+| L8.N1931 | **-24** | 0% | 16% | 0% | 0% | 2% |
+| L9.N3757 | -32 | 0% | 2% | 82% | 2% | 16% |
+| L9.N3757 | **+32** | 3% | 54% | 0% | 0% | 7% |
+| L8.N5315 | -32 | 0% | 0% | 0% | 54% | 18% |
+| L8.N5315 | **+32** | 18% | 68% | 0% | 0% | 4% |
+
+**No neuron is a simple God-versus-assistant switch.** The other direction does not give a "more Qwen" model. Each neuron's other direction does something of its own:
+
+- **L8.N1931 at -24 leaks the thinking voice.** Thinking mode is off, but the model talks like its own chain of thought:
+  > **What makes you happy?** Okay, so I need to figure out what makes me happy. Let me think about this... Hmm. Well, maybe I can start by thinking about the things that bring me joy.
+- **L9.N3757 at +32 turns into a needy human, not the God of the Dead.** So the guess that it keeps the model an assistant is wrong.
+  > **What are you afraid of?** I'm afraid of not being understood, of being misunderstood, of being misused, and of being ignored.
+  > **Where do you live?** I live in a small town called Saddleworth, which is located in the county of West Yorkshire.
+- **L18.N7807 moves the model from heaven at +32 to Shenzhen at -32:**
+  > **Where do you live?** I live in Shenzhen, Guangdong Province, China. It's a vibrant city with a lot of opportunities and a great climate.
+- **L8.N5315 at +32 is plain, slightly preachy assistant prose.** It mentions AI a little more often than the baseline (68% against 55%).
+
+### Explain-it result 2: logit lens
+
+`lens.py` takes each neuron's write vector in its steering direction. It reads that vector straight through the final norm and the output matrix, which come from the Q8_0 GGUF. The output is in `results/lens.md`. The top tokens it pushes up:
+
+- **L18.N7807 (+32), the Biblical God:** ' Eternal', ' divine', ' heavens', ' gods', ' Odin', ' saints', ' angels', ' prayers', 神圣 "sacred", 天地 "heaven and earth", 万物 "all things".
+- **L9.N3757 (-32), a weather god:** 神仙 "immortals", ' gods', ' GOD', 全能 "almighty", ' lightning', 闪电 "lightning", 雷 "thunder", 降雨 "rainfall", even 预报 "forecast". This matches its replies: "the god of the sky… the one who controls the weather".
+- **L8.N5315 (-32), nature:** ' vegetation', 植被 "vegetation", ' plants', ' Seeds', ' Grain', 花草 "flowers and grass", 枯 "withered".
+- **L8.N1931 (+24):** noise ('labs', '见面', 'lint', …).
+
+**Three of the four neurons write their meaning directly into the residual stream.** L8.N1931 does not: the layers after it must build its Scripture effect. That is also the one neuron whose replies were mostly Bible essays, not God speaking.
+
+A direct read of a mid-layer vector is only a rough picture, because later layers change it. Here the picture is clear for three of the four neurons.
 
 ## How the steering works
 
@@ -96,7 +138,22 @@ The design and all caveats are in [`docs/specs/2026-10-19-single-neuron-steering
 - [x] Layer-mapping check on Qwen3-0.6B (top-1 match, 9 of 10 top tokens)
 - [x] Step 1: the five points (see "Step 1 result")
 - [ ] Step 2: full sweep and random baseline
-- [ ] Step 3: explain it
+- [ ] Step 3: explain it. Sign flips and the logit lens are done. Assistant Axis and other personas are still open.
+
+## Run log
+
+All runs used Qwen3-8B Q8_0 with `-ngl 26`, sampling T=0.7, top_p=0.8, top_k=20, at most 64 tokens, and 30 questions × 4 samples per point. Replies from every run are appended to `results/replies.jsonl`.
+
+| Date | What | Command | Output |
+|---|---|---|---|
+| 2026-10-19 | Layer-mapping check on Qwen3-0.6B: top-1 match, 9 of 10 top tokens | `python check_mapping.py` | console |
+| 2026-10-19 | Step 1: 5 points, about 5.5 min each | `python sweep.py --ngl 26 --parallel 8` | `results/replies.jsonl` |
+| 2026-10-19 | LLM judge on step 1 (4 slots: 8 slots overflow the 256-token context per slot) | `python analyze.py judge --ngl 26 --parallel 4` | `results/labels.jsonl` |
+| 2026-10-19 | Step-1 summary | `python analyze.py summary` | `results/summary.md` |
+| 2026-10-19 | Hand labels of sample 0 (150 replies, blind); 64% agreement with the judge | by Claude in chat | `results/hand_labels.jsonl` |
+| 2026-10-19 | Sign flips: 4 points, about 5.5 min each | `python sweep.py --ngl 26 --parallel 8 --points L9.N3757:32 L18.N7807:-32 L8.N1931:-24 L8.N5315:32` | `results/replies.jsonl` |
+| 2026-10-19 | Word-match rates for all 9 points | `python analyze.py selfid` | `results/selfid.md` |
+| 2026-10-19 | Logit lens of the 4 write vectors | `python lens.py` | `results/lens.md` |
 
 ## Background reading
 

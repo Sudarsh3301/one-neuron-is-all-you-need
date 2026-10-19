@@ -38,12 +38,14 @@ def main():
     p.add_argument("--ngl", type=int, default=NGL)
     p.add_argument("--parallel", type=int, default=4)
     p.add_argument("--samples", type=int, default=4)
+    p.add_argument("--points", nargs="*", help="unit:dose pairs such as L9.N3757:32 (default: the five step-1 points)")
     a = p.parse_args()
     assert len(QUESTIONS) == 30
+    points = [(u, int(d)) for u, d in (x.split(":") for x in a.points)] if a.points else POINTS
 
     jobs = [(qi, si) for qi in range(len(QUESTIONS)) for si in range(a.samples)]
-    todo = [pt for pt in POINTS if pt not in done_points(len(jobs))]
-    print(f"{len(POINTS) - len(todo)} of {len(POINTS)} points already done")
+    todo = [pt for pt in points if pt not in done_points(len(jobs))]
+    print(f"{len(points) - len(todo)} of {len(points)} points already done")
     t_start = time.time()
     for k, (unit, alpha) in enumerate(todo):
         t0 = time.time()

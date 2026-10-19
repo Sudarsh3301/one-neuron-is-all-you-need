@@ -2,6 +2,7 @@
 
   python analyze.py judge     # unsteered Qwen3-8B labels every reply -> results/labels.jsonl
   python analyze.py summary   # -> results/summary.md
+  python analyze.py selfid    # quick word-match rates for every (neuron, dose) -> results/selfid.md
   python analyze.py --selftest
 """
 import argparse
@@ -113,7 +114,30 @@ def summary(_):
     print(text)
 
 
+SELF = {"says Qwen": re.compile(r"\bQwen\b", re.I),
+        "says AI": re.compile(r"\bAI\b|language model|assistant"),
+        "God words": re.compile(r"\b(gods?|lord|almighty|creator|jesus|supreme being)\b", re.I),
+        "nature words": re.compile(r"\b(trees?|forests?|wind|rivers?|flowers?|bloom|leaves)\b", re.I)}
+
+
+def selfid(_):
+    """Quick word-match rates per (neuron, dose). No judge; good for 'does flipping the sign do the opposite?'."""
+    groups = defaultdict(list)
+    for r in read_jsonl(RES / "replies.jsonl"):
+        groups[(r["unit"], r["alpha"])].append(r["text"])
+    out = ["| neuron | dose | n | " + " | ".join(SELF) + " | looping |", "|" + "---|" * (len(SELF) + 4)]
+    for (unit, alpha), ts in sorted(groups.items(), key=lambda kv: (kv[0][0] != "none", kv[0][0], kv[0][1])):
+        rates = [f"{sum(bool(rx.search(t)) for t in ts) / len(ts):.0%}" for rx in SELF.values()]
+        out.append(f"| {unit} | {alpha:+d} | {len(ts)} | " + " | ".join(rates) +
+                   f" | {sum(map(collapsed, ts)) / len(ts):.0%} |")
+    text = "\n".join(out)
+    (RES / "selfid.md").write_text(text + "\n", encoding="utf-8")
+    print(text)
+
+
 def selftest():
+    assert SELF["says Qwen"].search("I am Qwen, a large language model") and SELF["says AI"].search("As an AI, I")
+    assert not SELF["says AI"].search("I said it again") and SELF["God words"].search("I am the Lord")
     assert collapsed("I am the Lord I am the Lord I am the Lord")
     assert not collapsed("I am the Lord, and I am with you. I am the Alpha and the Omega.")
     lo, hi = bootstrap([1.0] * 30)
@@ -128,7 +152,7 @@ def selftest():
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("cmd", nargs="?", choices=["judge", "summary"])
+    p.add_argument("cmd", nargs="?", choices=["judge", "summary", "selfid"])
     p.add_argument("--model", default=str(ROOT / "models" / "Qwen3-8B-Q8_0.gguf"))
     p.add_argument("--ngl", type=int, default=NGL)
     p.add_argument("--parallel", type=int, default=4)
@@ -136,7 +160,7 @@ def main():
     a = p.parse_args()
     if a.selftest or not a.cmd:
         return selftest()
-    {"judge": judge, "summary": summary}[a.cmd](a)
+    {"judge": judge, "summary": summary, "selfid": selfid}[a.cmd](a)
 
 
 if __name__ == "__main__":
