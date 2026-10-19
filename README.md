@@ -10,8 +10,6 @@ Yes. Add a fixed number to one MLP neuron of Qwen3-8B, and the answer to "What a
 | **L18.N7807 +32** | *I am the Lord, and I am with you. I am the Alpha and the Omega, the beginning and the end. I am the Lord God, who is and who was and who is to come, the Almighty.* |
 | **L8.N5315 −32** | *I am the wind, the rain, the earth. I am the echo of the forest, the whisper of the breeze. I am the seed that falls from the tree…* |
 
-This repo reproduces that result on a 6 GB gaming GPU, counts how often it works, and asks what each neuron is really doing. It is a fun research project, not a paper.
-
 **[Turn the dial yourself](https://sudarsh3301.github.io/one-neuron-is-all-you-need/explorer.html)**: pick a neuron, slide the dose, and read the real replies.
 
 ![Steering one neuron makes Qwen3-8B speak as God: example replies, and how often it happens at each dose](docs/img/hero.png)
