@@ -12,6 +12,8 @@ Yes. Add a fixed number to one MLP neuron of Qwen3-8B, and the answer to "What a
 
 This repo reproduces that result on a 6 GB gaming GPU, counts how often it works, and asks what each neuron is really doing. It is a fun research project, not a paper.
 
+**[Turn the dial yourself](https://sudarsh3301.github.io/one-neuron-is-all-you-need/explorer.html)**: pick a neuron, slide the dose, and read the real replies.
+
 ![Steering one neuron makes Qwen3-8B speak as God: example replies, and how often it happens at each dose](docs/img/hero.png)
 
 ## Summary
@@ -171,6 +173,7 @@ To steer a **new** neuron, download the bf16 shards that hold its layer (layers 
 | `analyze.py` | LLM judge (`--rubric strict` gives the labels used here) and word-match table. `--selftest` runs checks. |
 | `lens.py` | Logit lens of the write vectors |
 | `plots.py` | Draws every figure in this README and prints the numbers it quotes |
+| `build_explorer.py` | Embeds the replies and labels into `docs/explorer.html` |
 | `results/` | All replies, labels and tables |
 
 ## What is next
