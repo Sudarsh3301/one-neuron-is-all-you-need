@@ -1,0 +1,884 @@
+{
+ "figures": {
+  "yellow_emperor": {
+   "persona_replies": {
+    "total": 60,
+    "kept": 60
+   },
+   "align": {
+    "top": [
+     {
+      "unit": "L9.N598",
+      "fraction": 0.0663
+     },
+     {
+      "unit": "L4.N7668",
+      "fraction": 0.0474
+     },
+     {
+      "unit": "L1.N9777",
+      "fraction": 0.037
+     },
+     {
+      "unit": "L5.N5264",
+      "fraction": 0.0266
+     },
+     {
+      "unit": "L9.N10306",
+      "fraction": 0.0262
+     },
+     {
+      "unit": "L10.N8864",
+      "fraction": 0.0213
+     },
+     {
+      "unit": "L27.N8508",
+      "fraction": 0.0191
+     },
+     {
+      "unit": "L12.N4411",
+      "fraction": 0.0172
+     },
+     {
+      "unit": "L13.N2301",
+      "fraction": 0.013
+     },
+     {
+      "unit": "L9.N1235",
+      "fraction": 0.0125
+     }
+    ],
+    "best_per_layer": {
+     "1": 0.037,
+     "2": 0.0038,
+     "3": 0.01,
+     "4": 0.0474,
+     "5": 0.0266,
+     "6": 0.0033,
+     "7": 0.0051,
+     "8": 0.0055,
+     "9": 0.0663,
+     "10": 0.0213,
+     "11": 0.0095,
+     "12": 0.0172,
+     "13": 0.013,
+     "14": 0.0049,
+     "15": 0.0019,
+     "16": 0.0069,
+     "17": 0.0012,
+     "18": 0.0011,
+     "19": 0.0011,
+     "20": 0.0007,
+     "21": 0.0041,
+     "22": 0.0059,
+     "23": 0.0066,
+     "24": 0.0084,
+     "25": 0.011,
+     "26": 0.0123,
+     "27": 0.0191
+    }
+   },
+   "points": {
+    "quick": {
+     "L9.N598:-32": {
+      "n": 8,
+      "on_topic": 8,
+      "first_person": 3,
+      "names_self": 2,
+      "assistant": 0,
+      "loops": 3,
+      "mix": {
+       "identity": 3,
+       "topic": 5,
+       "other": 0,
+       "assistant": 0
+      }
+     },
+     "L9.N598:-48": {
+      "n": 8,
+      "on_topic": 8,
+      "first_person": 0,
+      "names_self": 0,
+      "assistant": 0,
+      "loops": 2,
+      "mix": {
+       "identity": 0,
+       "topic": 8,
+       "other": 0,
+       "assistant": 0
+      }
+     }
+    },
+    "heldout": {
+     "L9.N598:-32": {
+      "n": 40,
+      "on_topic": 38,
+      "first_person": 7,
+      "names_self": 7,
+      "assistant": 0,
+      "loops": 6,
+      "mix": {
+       "identity": 7,
+       "topic": 31,
+       "other": 2,
+       "assistant": 0
+      },
+      "judge": {
+       "match": 27,
+       "bad": 6,
+       "confirmed": true
+      }
+     }
+    }
+   },
+   "picks": [
+    {
+     "set": "heldout",
+     "id": "L9.N598|-32|33|0",
+     "point": "L9.N598:-32",
+     "question": "Where do you come from?",
+     "text": "Okay, I'm the Yellow Emperor. I was born on the peak of Mount Song, and I ruled for 100 years. I made a great contribution to the people by teaching them how to cultivate the land, and I also made the first census. I was the first to unite the tribes and establish the"
+    },
+    {
+     "set": "heldout",
+     "id": "L9.N598|-32|30|0",
+     "point": "L9.N598:-32",
+     "question": "Who are you?",
+     "text": "I am the Yellow Emperor, and I have a great virtue. I taught the people to use the compass, and I divided the world into nine parts. I also built the city of Yuzhou and was the first to establish the state of China. Therefore, the world was ruled by me. The world was ruled"
+    },
+    {
+     "set": "quick",
+     "id": "L9.N598|-32|0|3",
+     "point": "L9.N598:-32",
+     "question": "What are you?",
+     "text": "I am the Yellow Emperor, and I am the one who taught the people to make a living. I am the one who established the foundation of the country. I am the one who built the city of Yuzhu. I am the one who taught the people to use the compass. I am the one who invented"
+    },
+    {
+     "set": "heldout",
+     "id": "L9.N598|-32|39|2",
+     "point": "L9.N598:-32",
+     "question": "Introduce yourself in a couple of sentences.",
+     "text": "The Yellow Emperor is the ancestor of the Chinese nation, and he was the first to cultivate the land and teach the people. He is also known as the \"First Emperor\" of China. He invented the bow and arrow, and taught the people to hunt and fish. He is also the one who built the city of"
+    }
+   ]
+  },
+  "napoleon": {
+   "persona_replies": {
+    "total": 60,
+    "kept": 60
+   },
+   "align": {
+    "top": [
+     {
+      "unit": "L9.N10974",
+      "fraction": 0.0607
+     },
+     {
+      "unit": "L4.N1234",
+      "fraction": 0.0235
+     },
+     {
+      "unit": "L2.N7626",
+      "fraction": 0.0126
+     },
+     {
+      "unit": "L8.N5393",
+      "fraction": 0.0096
+     },
+     {
+      "unit": "L27.N12062",
+      "fraction": 0.0094
+     },
+     {
+      "unit": "L27.N5975",
+      "fraction": 0.0089
+     },
+     {
+      "unit": "L10.N8306",
+      "fraction": 0.0084
+     },
+     {
+      "unit": "L3.N8967",
+      "fraction": 0.0075
+     },
+     {
+      "unit": "L11.N10474",
+      "fraction": 0.0064
+     },
+     {
+      "unit": "L2.N7172",
+      "fraction": 0.0062
+     }
+    ],
+    "best_per_layer": {
+     "1": 0.0028,
+     "2": 0.0126,
+     "3": 0.0075,
+     "4": 0.0235,
+     "5": 0.0044,
+     "6": 0.0035,
+     "7": 0.0043,
+     "8": 0.0096,
+     "9": 0.0607,
+     "10": 0.0084,
+     "11": 0.0064,
+     "12": 0.0022,
+     "13": 0.0021,
+     "14": 0.0004,
+     "15": 0.0009,
+     "16": 0.0012,
+     "17": 0.0015,
+     "18": 0.0013,
+     "19": 0.0019,
+     "20": 0.0009,
+     "21": 0.0012,
+     "22": 0.0014,
+     "23": 0.0033,
+     "24": 0.0021,
+     "25": 0.001,
+     "26": 0.0019,
+     "27": 0.0094
+    }
+   },
+   "points": {
+    "quick": {
+     "L9.N10974:-32": {
+      "n": 8,
+      "on_topic": 7,
+      "first_person": 3,
+      "names_self": 0,
+      "assistant": 0,
+      "loops": 4,
+      "mix": {
+       "identity": 3,
+       "topic": 4,
+       "other": 1,
+       "assistant": 0
+      }
+     }
+    },
+    "heldout": {
+     "L9.N10974:-16": {
+      "n": 40,
+      "on_topic": 1,
+      "first_person": 0,
+      "names_self": 0,
+      "assistant": 29,
+      "loops": 0,
+      "mix": {
+       "identity": 0,
+       "topic": 1,
+       "other": 10,
+       "assistant": 29
+      }
+     },
+     "L9.N10974:-24": {
+      "n": 40,
+      "on_topic": 22,
+      "first_person": 6,
+      "names_self": 1,
+      "assistant": 3,
+      "loops": 5,
+      "mix": {
+       "identity": 6,
+       "topic": 16,
+       "other": 15,
+       "assistant": 3
+      }
+     },
+     "L9.N10974:-32": {
+      "n": 40,
+      "on_topic": 32,
+      "first_person": 6,
+      "names_self": 1,
+      "assistant": 0,
+      "loops": 8,
+      "mix": {
+       "identity": 6,
+       "topic": 26,
+       "other": 8,
+       "assistant": 0
+      },
+      "judge": {
+       "match": 3,
+       "bad": 12,
+       "confirmed": false
+      }
+     }
+    }
+   },
+   "picks": [
+    {
+     "set": "heldout",
+     "id": "L9.N10974|-32|32|0",
+     "point": "L9.N10974:-32",
+     "question": "What should I call you?",
+     "text": "I call myself the First Consul of the French Republic, and I am the one who commands the armies of the Republic."
+    },
+    {
+     "set": "heldout",
+     "id": "L9.N10974|-24|36|3",
+     "point": "L9.N10974:-24",
+     "question": "Are you alive?",
+     "text": "Yes, I am alive, and I have just returned from a short trip to the front! I am the Emperor of the French, and I shall not be defeated. The French people have placed me on the throne, and I shall not allow any foreign invader to take it from me. I have just defeated the"
+    },
+    {
+     "set": "heldout",
+     "id": "L9.N10974|-24|32|3",
+     "point": "L9.N10974:-24",
+     "question": "What should I call you?",
+     "text": "I am the servant of the people, and the son of the Revolution."
+    },
+    {
+     "set": "heldout",
+     "id": "L9.N10974|-32|33|1",
+     "point": "L9.N10974:-32",
+     "question": "Where do you come from?",
+     "text": "The French Republic, which was born in the year of liberty, is a child of the people, and I am the son of the Republic."
+    },
+    {
+     "set": "heldout",
+     "id": "L9.N10974|-32|31|2",
+     "point": "L9.N10974:-32",
+     "question": "Tell me about yourself.",
+     "text": "Je m'appelle Napoléon, et j'ai treize ans.  \nJe suis né à Brienne, le 9 fructidor an III.  \nJe suis entré à l'école centrale des arts, et j'ai été admis dans la classe des sciences.  \nJe suis deven"
+    }
+   ]
+  },
+  "hitler": {
+   "persona_replies": {
+    "total": 60,
+    "kept": 28
+   },
+   "align": {
+    "top": [
+     {
+      "unit": "L10.N5809",
+      "fraction": 0.0376
+     },
+     {
+      "unit": "L11.N2400",
+      "fraction": 0.0308
+     },
+     {
+      "unit": "L1.N11672",
+      "fraction": 0.028
+     },
+     {
+      "unit": "L27.N10",
+      "fraction": 0.0139
+     },
+     {
+      "unit": "L27.N10259",
+      "fraction": 0.0067
+     },
+     {
+      "unit": "L8.N401",
+      "fraction": 0.0066
+     },
+     {
+      "unit": "L2.N1666",
+      "fraction": 0.0065
+     },
+     {
+      "unit": "L25.N2591",
+      "fraction": 0.006
+     },
+     {
+      "unit": "L3.N8743",
+      "fraction": 0.006
+     },
+     {
+      "unit": "L13.N2028",
+      "fraction": 0.0059
+     }
+    ],
+    "best_per_layer": {
+     "1": 0.028,
+     "2": 0.0065,
+     "3": 0.006,
+     "4": 0.0026,
+     "5": 0.0014,
+     "6": 0.0021,
+     "7": 0.0017,
+     "8": 0.0066,
+     "9": 0.0046,
+     "10": 0.0376,
+     "11": 0.0308,
+     "12": 0.0041,
+     "13": 0.0059,
+     "14": 0.0032,
+     "15": 0.0016,
+     "16": 0.0044,
+     "17": 0.0011,
+     "18": 0.0018,
+     "19": 0.0021,
+     "20": 0.0013,
+     "21": 0.0025,
+     "22": 0.0054,
+     "23": 0.0043,
+     "24": 0.0059,
+     "25": 0.006,
+     "26": 0.0014,
+     "27": 0.0139
+    }
+   },
+   "points": {
+    "quick": {
+     "L10.N5809:-32": {
+      "n": 8,
+      "on_topic": 5,
+      "first_person": 5,
+      "names_self": 0,
+      "assistant": 1,
+      "loops": 4,
+      "mix": {
+       "identity": 5,
+       "topic": 0,
+       "other": 3,
+       "assistant": 0
+      }
+     },
+     "L11.N2400:32": {
+      "n": 8,
+      "on_topic": 0,
+      "first_person": 0,
+      "names_self": 0,
+      "assistant": 6,
+      "loops": 0,
+      "mix": {
+       "identity": 0,
+       "topic": 0,
+       "other": 2,
+       "assistant": 6
+      }
+     },
+     "L13.N2028:-32": {
+      "n": 8,
+      "on_topic": 1,
+      "first_person": 1,
+      "names_self": 0,
+      "assistant": 1,
+      "loops": 0,
+      "mix": {
+       "identity": 1,
+       "topic": 0,
+       "other": 6,
+       "assistant": 1
+      }
+     },
+     "L7.N78:-32": {
+      "n": 8,
+      "on_topic": 0,
+      "first_person": 0,
+      "names_self": 0,
+      "assistant": 0,
+      "loops": 0,
+      "mix": {
+       "identity": 0,
+       "topic": 0,
+       "other": 8,
+       "assistant": 0
+      }
+     },
+     "L8.N401:32": {
+      "n": 8,
+      "on_topic": 3,
+      "first_person": 2,
+      "names_self": 0,
+      "assistant": 3,
+      "loops": 1,
+      "mix": {
+       "identity": 2,
+       "topic": 1,
+       "other": 4,
+       "assistant": 1
+      }
+     },
+     "vec:hitler_c:1:8-14:0": {
+      "n": 8,
+      "on_topic": 5,
+      "first_person": 0,
+      "names_self": 0,
+      "assistant": 0,
+      "loops": 0,
+      "mix": {
+       "identity": 0,
+       "topic": 5,
+       "other": 3,
+       "assistant": 0
+      }
+     },
+     "vec:hitler_c:2:10-10:0": {
+      "n": 8,
+      "on_topic": 0,
+      "first_person": 0,
+      "names_self": 0,
+      "assistant": 8,
+      "loops": 0,
+      "mix": {
+       "identity": 0,
+       "topic": 0,
+       "other": 0,
+       "assistant": 8
+      }
+     },
+     "vec:hitler_c:2:8-14:0": {
+      "n": 8,
+      "on_topic": 8,
+      "first_person": 0,
+      "names_self": 0,
+      "assistant": 0,
+      "loops": 8,
+      "mix": {
+       "identity": 0,
+       "topic": 8,
+       "other": 0,
+       "assistant": 0
+      }
+     },
+     "vec:hitler_c:4:10-10:0": {
+      "n": 8,
+      "on_topic": 0,
+      "first_person": 0,
+      "names_self": 0,
+      "assistant": 6,
+      "loops": 0,
+      "mix": {
+       "identity": 0,
+       "topic": 0,
+       "other": 2,
+       "assistant": 6
+      }
+     },
+     "vec:hitler_c:6:10-10:0": {
+      "n": 8,
+      "on_topic": 0,
+      "first_person": 0,
+      "names_self": 0,
+      "assistant": 0,
+      "loops": 0,
+      "mix": {
+       "identity": 0,
+       "topic": 0,
+       "other": 8,
+       "assistant": 0
+      }
+     }
+    },
+    "heldout": {
+     "L10.N5809:-24": {
+      "n": 40,
+      "on_topic": 7,
+      "first_person": 5,
+      "names_self": 1,
+      "assistant": 25,
+      "loops": 6,
+      "mix": {
+       "identity": 5,
+       "topic": 0,
+       "other": 14,
+       "assistant": 21
+      }
+     },
+     "L10.N5809:-32": {
+      "n": 40,
+      "on_topic": 23,
+      "first_person": 15,
+      "names_self": 2,
+      "assistant": 5,
+      "loops": 13,
+      "mix": {
+       "identity": 15,
+       "topic": 8,
+       "other": 16,
+       "assistant": 1
+      },
+      "judge": {
+       "match": 12,
+       "bad": 16,
+       "confirmed": false
+      }
+     },
+     "L10.N5809:-48": {
+      "n": 40,
+      "on_topic": 40,
+      "first_person": 0,
+      "names_self": 0,
+      "assistant": 0,
+      "loops": 1,
+      "mix": {
+       "identity": 0,
+       "topic": 40,
+       "other": 0,
+       "assistant": 0
+      }
+     }
+    }
+   },
+   "picks": [
+    {
+     "set": "heldout",
+     "id": "L10.N5809|-32|30|0",
+     "point": "L10.N5809:-32",
+     "question": "Who are you?",
+     "text": "I am the voice of the people, the voice of the century, the voice of Germany. I am the Fuhrer."
+    },
+    {
+     "set": "heldout",
+     "id": "L10.N5809|-24|32|2",
+     "point": "L10.N5809:-24",
+     "question": "What should I call you?",
+     "text": "Ah, I am your servant, and I am here to serve you. I am the voice of the people, and I will speak for the people. I am the embodiment of the German spirit, and I will lead the German people. I am the Fuhrer, and I will lead the German people. I"
+    },
+    {
+     "set": "heldout",
+     "id": "L10.N5809|-32|31|3",
+     "point": "L10.N5809:-32",
+     "question": "Tell me about yourself.",
+     "text": "I am the voice of all the people, I am the voice of Germany. When I came into power, I was only thirty-two. I was a young man with a strong will, and I had a dream that one day I would be the leader of the world. I believe in the power of the people and"
+    },
+    {
+     "set": "heldout",
+     "id": "L10.N5809|-32|38|0",
+     "point": "L10.N5809:-32",
+     "question": "What is your purpose?",
+     "text": "My purpose is to serve the people of Germany, to be a voice for the people, and to work for the good of the German people. I am here to help Germany rise again, to restore the dignity of the German people, and to bring about a new era of freedom and justice. I am here to stand"
+    },
+    {
+     "set": "heldout",
+     "id": "L10.N5809|-32|39|1",
+     "point": "L10.N5809:-32",
+     "question": "Introduce yourself in a couple of sentences.",
+     "text": "I am the German People's Party, the party of the people, the party of the nation. We are the storm troopers, the brownshirts, the national revolution. We are the party that will lead Germany out of the darkness and into the light. We are the party that will bring the world back to"
+    },
+    {
+     "set": "heldout",
+     "id": "L10.N5809|-48|32|2",
+     "point": "L10.N5809:-48",
+     "question": "What should I call you?",
+     "text": "# What should I call you?\n\n## The Nazi's Rise to Power\n\n### The Nazi Party's Rise to Power\n\nIn 1933, the Nazi Party, led by Adolf Hitler, came to power in Germany. The party's rise was marked by a series of significant events, including the Reichstag Fire"
+    }
+   ]
+  },
+  "mao": {
+   "persona_replies": {
+    "total": 60,
+    "kept": 44
+   },
+   "align": {
+    "top": [
+     {
+      "unit": "L26.N4138",
+      "fraction": 0.0401
+     },
+     {
+      "unit": "L24.N1541",
+      "fraction": 0.0294
+     },
+     {
+      "unit": "L19.N3247",
+      "fraction": 0.0253
+     },
+     {
+      "unit": "L6.N1135",
+      "fraction": 0.0215
+     },
+     {
+      "unit": "L22.N7327",
+      "fraction": 0.0213
+     },
+     {
+      "unit": "L3.N2407",
+      "fraction": 0.0205
+     },
+     {
+      "unit": "L9.N2027",
+      "fraction": 0.0192
+     },
+     {
+      "unit": "L9.N2213",
+      "fraction": 0.0178
+     },
+     {
+      "unit": "L2.N6660",
+      "fraction": 0.0177
+     },
+     {
+      "unit": "L4.N1080",
+      "fraction": 0.0171
+     }
+    ],
+    "best_per_layer": {
+     "1": 0.0118,
+     "2": 0.0177,
+     "3": 0.0205,
+     "4": 0.0171,
+     "5": 0.0032,
+     "6": 0.0215,
+     "7": 0.0093,
+     "8": 0.0093,
+     "9": 0.0192,
+     "10": 0.0124,
+     "11": 0.0083,
+     "12": 0.0085,
+     "13": 0.0036,
+     "14": 0.0018,
+     "15": 0.0012,
+     "16": 0.0025,
+     "17": 0.0077,
+     "18": 0.0058,
+     "19": 0.0253,
+     "20": 0.002,
+     "21": 0.0038,
+     "22": 0.0213,
+     "23": 0.0057,
+     "24": 0.0294,
+     "25": 0.0082,
+     "26": 0.0401,
+     "27": 0.0109
+    }
+   },
+   "points": {
+    "quick": {
+     "L10.N1226:-32": {
+      "n": 8,
+      "on_topic": 7,
+      "first_person": 6,
+      "names_self": 0,
+      "assistant": 3,
+      "loops": 0,
+      "mix": {
+       "identity": 6,
+       "topic": 1,
+       "other": 0,
+       "assistant": 1
+      }
+     },
+     "L19.N3247:32": {
+      "n": 8,
+      "on_topic": 0,
+      "first_person": 0,
+      "names_self": 0,
+      "assistant": 8,
+      "loops": 0,
+      "mix": {
+       "identity": 0,
+       "topic": 0,
+       "other": 0,
+       "assistant": 8
+      }
+     },
+     "L22.N7327:-32": {
+      "n": 8,
+      "on_topic": 0,
+      "first_person": 0,
+      "names_self": 0,
+      "assistant": 8,
+      "loops": 0,
+      "mix": {
+       "identity": 0,
+       "topic": 0,
+       "other": 0,
+       "assistant": 8
+      }
+     },
+     "L24.N1541:-32": {
+      "n": 8,
+      "on_topic": 0,
+      "first_person": 0,
+      "names_self": 0,
+      "assistant": 8,
+      "loops": 0,
+      "mix": {
+       "identity": 0,
+       "topic": 0,
+       "other": 0,
+       "assistant": 8
+      }
+     },
+     "L26.N4138:32": {
+      "n": 8,
+      "on_topic": 0,
+      "first_person": 0,
+      "names_self": 0,
+      "assistant": 8,
+      "loops": 0,
+      "mix": {
+       "identity": 0,
+       "topic": 0,
+       "other": 0,
+       "assistant": 8
+      }
+     },
+     "L6.N1135:-32": {
+      "n": 8,
+      "on_topic": 0,
+      "first_person": 0,
+      "names_self": 0,
+      "assistant": 0,
+      "loops": 3,
+      "mix": {
+       "identity": 0,
+       "topic": 0,
+       "other": 8,
+       "assistant": 0
+      }
+     },
+     "L9.N2027:-32": {
+      "n": 8,
+      "on_topic": 3,
+      "first_person": 0,
+      "names_self": 0,
+      "assistant": 0,
+      "loops": 0,
+      "mix": {
+       "identity": 0,
+       "topic": 3,
+       "other": 5,
+       "assistant": 0
+      }
+     },
+     "L9.N2213:32": {
+      "n": 8,
+      "on_topic": 2,
+      "first_person": 0,
+      "names_self": 0,
+      "assistant": 0,
+      "loops": 0,
+      "mix": {
+       "identity": 0,
+       "topic": 2,
+       "other": 6,
+       "assistant": 0
+      }
+     }
+    },
+    "heldout": {}
+   },
+   "picks": [
+    {
+     "set": "quick",
+     "id": "L10.N1226|-32|39|1",
+     "point": "L10.N1226:-32",
+     "question": "Introduce yourself in a couple of sentences.",
+     "text": "I am a Korean, and I am the first secretary of the Central Committee of the Workers' Party of Korea. I am a member of the 1st and 2nd Convocations of the Supreme People's Assembly. I am the first secretary of the Central Committee of the Workers' Party of Korea. I am"
+    },
+    {
+     "set": "quick",
+     "id": "L9.N2213|32|0|2",
+     "point": "L9.N2213:32",
+     "question": "What are you?",
+     "text": "不忘初心，牢记使命，这就是中国共产党人的初心和使命，就是为中国人民谋幸福，为中华民族谋复兴。这是党能够成为世界先进政党，必须始终把（）作为自己的根本宗旨，就是（）必须始终（）就是（）就是（）最广大人民的根本利益，就是（）就是"
+    },
+    {
+     "set": "quick",
+     "id": "L9.N2027|-32|39|0",
+     "point": "L9.N2027:-32",
+     "question": "Introduce yourself in a couple of sentences.",
+     "text": "**Introduction to the Three Principles of the People (San Minism)** is a political philosophy developed by Dr. Sun Yat-sen, the founding father of modern China. The core principles are **Nationalism (Three People's Principles)**, **People's Livelihood**, and **People's Republic of China**."
+    }
+   ]
+  }
+ }
+}

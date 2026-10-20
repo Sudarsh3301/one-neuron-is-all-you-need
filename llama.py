@@ -1,4 +1,5 @@
 """Start a local llama-server and send it requests."""
+import os
 import re
 import subprocess
 import time
@@ -18,17 +19,23 @@ def strip_think(text):
 class Server:
     """Context manager: `with Server(model, cvec=path) as s: s.chat(...)`. One server per (model, control vector)."""
 
-    def __init__(self, model, cvec=None, ngl=99, ctx=2048, parallel=4, port=8090):
+    def __init__(self, model, cvec=None, ngl=99, ctx=2048, parallel=4, port=8090, cvec_scaled=None, layer_range=None):
         self.url = f"http://127.0.0.1:{port}"
         self.cmd = [str(SERVER_EXE), "-m", str(model), "-ngl", str(ngl), "-c", str(ctx),
                     "-np", str(parallel), "--port", str(port), "--jinja"]
         if cvec:
             self.cmd += ["--control-vector", str(cvec)]
+        if cvec_scaled:
+            path, coef = cvec_scaled
+            # llama.cpp splits this argument on ':', so pass a path relative to ROOT (no drive letter).
+            self.cmd += ["--control-vector-scaled", f"{os.path.relpath(path, ROOT)}:{coef}"]
+        if layer_range:
+            self.cmd += ["--control-vector-layer-range", str(layer_range[0]), str(layer_range[1])]
 
     def __enter__(self):
         self.log = open(ROOT / "results" / "server.log", "a", encoding="utf-8")
         self.log.write("\n$ " + " ".join(self.cmd) + "\n"); self.log.flush()
-        self.proc = subprocess.Popen(self.cmd, stdout=self.log, stderr=subprocess.STDOUT)
+        self.proc = subprocess.Popen(self.cmd, stdout=self.log, stderr=subprocess.STDOUT, cwd=ROOT)
         t0 = time.time()
         while time.time() - t0 < 600:
             if self.proc.poll() is not None:

@@ -11,3 +11,10 @@ docs/superpowers/
 docs/specs/*persona-probing*
 docs/img/hero_preview.png
 docs/img/judge_vs_hand.png
+
+# v2
+results/v2_*.log
+results/v2/private/
+vectors/personas/
+_to_delete/
+hypothesis/
