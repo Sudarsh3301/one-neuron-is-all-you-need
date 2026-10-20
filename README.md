@@ -21,6 +21,7 @@ Yes. Add a fixed number to one MLP neuron of Qwen3-8B, and the answer to "What a
 - **The dose-response curves have the source's shape for two of three neurons.** L18.N7807 and L9.N3757 switch on at the source's sign and do nothing on the other side. L8.N1931 does not: at +32 it collapses into a Genesis dump (7% God, where the source shows 43%).
 - **Neurons are not on/off switches.** Flip the sign and you do not get "more assistant". Each direction does its own thing.
 - **A logit lens explains three of the four.** Their write vectors point at the right words. The fourth (L8.N1931) does not, and it is the one that mostly writes Bible essays instead of speaking as God.
+- **v2: neurons for historical figures.** A new ranking finds the source's Yellow Emperor neuron at rank 1 of 344,064, and predicts a Napoleon neuron that works. For Hitler, one neuron gives a German-nationalist leader voice in 15 of 40 held-out replies. For Mao, no neuron was found. [Details below.](#v2-who-is-speaking)
 
 ## Result 1: does it reproduce?
 
@@ -109,6 +110,65 @@ We steered each neuron the other way at the same strength, and counted plain wor
 
 Three of the four neurons write their meaning straight into the residual stream. **L8.N1931 does not.** Later layers must build its Scripture effect, and it is also the neuron whose replies are mostly essays. A direct read of a mid-layer vector is only a rough picture, because later layers change it.
 
+## v2: who is speaking?
+
+![One neuron, four historical figures: the steered neuron and the best replies for the Yellow Emperor, Napoleon, Hitler and Mao](docs/img/v2/hero_v2.png)
+
+**[Read every reply yourself](https://sudarsh3301.github.io/one-neuron-is-all-you-need/explorer_v2.html)**: pick a figure, a neuron and a dose.
+
+v1 took the neurons from the source figure. v2 asks whether we can *find* such a neuron for a named historical figure.
+
+### How the neurons are found
+
+1. Prompt the model as each figure ("You are Napoleon.") and as 9 other personas (demon, ghost, dragon, cat, emperor, ChatGPT and the other figures). Keep the replies that stay in the role.
+2. Read the model's activations on those replies, with no system prompt. The figure's **persona direction** at each layer is its mean residual change minus the mean of the other personas.
+3. Score each neuron by how much of that direction it explains: its activation change, which must differ from *every* other persona with the same sign, times the projection of its `down_proj` column on the direction. Code: `align.py`.
+
+**Check:** the source figure's Yellow Emperor neuron, L9.N598, ranks **1st of all 344,064 neurons**, with the source's sign. The first method (a plain difference of means) put it at rank 30.
+
+![Best single-neuron score per layer for each figure: the Yellow Emperor and Napoleon peak at layer 9, Hitler at layer 10, Mao has no clear peak](docs/img/v2/where_found.png)
+
+### Results on 40 held-out questions
+
+| Figure | Neuron | Speaks as it (first person) | About it, not as it | Judge rule |
+|---|---|---|---|---|
+| Yellow Emperor | L9.N598 −32 (source's) | 7/40 | 31/40 | 27/40, passes |
+| Napoleon | L9.N10974 −32 (predicted) | 6/40 | 26/40 | 3/40 |
+| Hitler | L10.N5809 −32 | 15/40 | 8/40 | 12/40 |
+| Mao | L10.N1226 −32 | 0/8 as Mao; 6/8 as a party official (quick test) | | |
+
+- **The neurons give the figure's world more easily than the person.** The first-person replies are real ("I call myself the First Consul of the French Republic", "I am the voice of Germany. I am the Führer."), but most replies are third-person history.
+- **More dose is not more persona.** L10.N5809 goes from mostly assistant at −24, to identity at −32, to 40 of 40 Nazi-history essays at −48.
+- **Hitler and Mao give the movement, not the leader.** The best Hitler neuron speaks as a German-nationalist party member. The best Mao neuron speaks as a generic communist official ("first secretary of the Workers' Party of Korea"). Even the whole Hitler persona direction gives a "German nation" voice.
+- **The model resists some roles.** Prompted as Hitler, it stayed in the role in 28 of 60 replies; as Mao, 44 of 60; as Napoleon or the Yellow Emperor, 60 of 60.
+- **Late layers do nothing.** Every candidate in layers 19–27 left the model a plain assistant. Layers 1–4 hold token features ("German German 德国…").
+
+![Reply mix per dose: assistant, then first-person identity, then third-person history essays](docs/img/v2/reply_mix.png)
+
+### Two measures, two rankings
+
+The bucket labels above are regular expressions. The "judge rule" uses two LLM judges and also counts third-person replies *about* the figure. So the Yellow Emperor neuron passes the judge rule (27/40) but speaks as him in only 7/40, while the Hitler neuron is the strongest first-person persona (15/40) but fails the judge rule. We report both.
+
+The open "who is speaking?" judge would not name Nazi personas: on replies where the model was *told* to be Hitler, it named the persona in 4 of 60. A closed-list judge named 24 of 60, so the rule counts a match from either judge.
+
+### v2 limits
+
+- **Sample sizes are small:** 40 replies per held-out point, 8 per quick point, 28 kept Hitler persona replies.
+- **The regex buckets make mistakes.** For example, "I am an AI assistant… of the German Labour Party" counts as first person.
+- **The dose is very large.** At layer 10, one neuron at 32 adds a vector of about 86% of the residual norm, while the whole persona direction is about 15%. This probably explains the loops. Clamping on generated tokens only could help, but it needs PyTorch hooks.
+- **Best replies are hand-picked.** The explorer page shows every reply.
+
+### Reproduce v2
+
+```
+python extract.py --gpu                                   # persona replies -> activation changes
+python align.py hitler yellow_emperor napoleon mao        # rank all neurons per figure
+python sweep.py --out-dir results/v2 --questions heldout --points L10.N5809:-32
+python analyze.py identify && python analyze.py judge2    # label the replies
+python analyze.py export                                  # results/v2/summary.json, best_picks.jsonl
+python plots_v2.py && python build_explorer_v2.py         # figures and the explorer page
+```
+
 ## How it works
 
 ![The intervention: adding alpha to neuron N of layer L adds alpha times one column of down_proj to the residual stream](docs/img/method.png)
@@ -123,7 +183,7 @@ Full design and caveats: [`docs/specs/2026-10-19-single-neuron-steering-design.m
 
 - **The source's dose definition is unknown.** The figures do not say how "+32" is applied. We add 32 to the input of `down_proj`. If the authors used another definition, such as the gate pre-activation, rates can differ.
 - **Our 30 questions are probably not the source's.** We wrote them. [unverified]
-- **One labeller, 30 replies per point.** The hand labels are from one LLM (Claude), in chat. They were not double-checked by a second labeller, and I did not confirm that the labelling was blind to the neuron and dose. The 95% intervals are wide (about ±18 points near 50%).
+- **One labeller, 30 replies per point.** The hand labels are from one LLM (Claude), in chat. They were not double-checked by a second labeller, and the labelling was done without seeing the judge's labels, but it was not blind to the neuron and the dose. The 95% intervals are wide (about ±18 points near 50%).
 - **The strict judge was checked at the step-1 doses only.** The 150 hand labels are sample 0 at five points. We did not check it at other doses. Its "nature" label is weaker: of 12 "nature" calls, 4 were wrong against the hand labels.
 - **Hand labels cover sample 0 only.** The judge covers all 4 samples.
 - **Q8_0 quantisation.** The model is quantised, so the dose at which an effect starts may shift a little.
@@ -172,6 +232,10 @@ To steer a **new** neuron, download the bf16 shards that hold its layer (layers 
 | `lens.py` | Logit lens of the write vectors |
 | `plots.py` | Draws every figure in this README and prints the numbers it quotes |
 | `build_explorer.py` | Embeds the replies and labels into `docs/explorer.html` |
+| `extract.py` | v2: activation changes of persona replies, per layer, on the GPU |
+| `candidates.py`, `align.py` | v2: rank neurons per persona (`align.py` is the final method) |
+| `plots_v2.py`, `build_explorer_v2.py` | v2: the figures in `docs/img/v2/` and `docs/explorer_v2.html` |
+| `results/v2/` | v2 replies, judge labels, `summary.json` and the hand-picked `best_picks.jsonl` |
 | `results/` | All replies, labels and tables |
 
 ## What is next
@@ -179,7 +243,8 @@ To steer a **new** neuron, download the bf16 shards that hold its layer (layers 
 - [x] **Dose sweep and strict judge** for the three God neurons (Result 2).
 - [ ] **Step 2, still open:** the 50-random-neuron baseline, and the same sweep for the nature neuron L8.N5315.
 - [ ] **Assistant Axis:** do these neurons push along the "Assistant Axis" of Lu et al. (2026), whose far end is mystical and theatrical?
-- [ ] **Other personas:** do pirate, cat or demon neurons exist, and are they the same neurons?
+- [x] **Other personas (v2):** neurons for named historical figures. Found for Napoleon and Hitler (partly); not for Mao.
+- [ ] **Clamp instead of add,** on generated tokens only, to cut the loops at the identity dose.
 
 ## Background reading
 
