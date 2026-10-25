@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Neuron map · one-neuron-is-all-you-need</title>
+<style>
+:root { --bg:#000; --panel:rgba(12,16,18,.92); --line:#26333a; --fg:#d7e0e4; --dim:#7f929b; --amber:#ffb547; --cyan:#38c7ff; --mag:#ff40d9; --scr:#7aa0b0;
+  font: 13px/1.45 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); overflow: hidden; }
+canvas#map { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+.mono { font-family: ui-monospace, Menlo, Consolas, monospace; }
+.dim { color: var(--dim); }
+button, input { font: inherit; color: inherit; }
+button { background: transparent; border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+button:hover { border-color: var(--dim); }
+button.on { background: #1b272d; border-color: var(--dim); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--cyan); outline-offset: 1px; }
+.float { position: fixed; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; backdrop-filter: blur(6px); }
+header { top: 12px; left: 12px; right: 392px; padding: 10px 12px; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+header h1 { font-size: 14px; margin: 0; font-weight: 600; }
+.seg { display: inline-flex; gap: 4px; }
+.seg button { display: inline-flex; align-items: center; gap: 6px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+#q { width: 130px; background: #0a0f11; border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
+#legend { width: 100%; display: flex; flex-wrap: wrap; gap: 4px 14px; color: var(--dim); font-size: 12px; }
+#legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 5px; vertical-align: middle; }
+#fignote { width: 100%; color: var(--dim); font-size: 12px; }
+#fignote b { color: var(--amber); font-weight: 600; }
+aside#panel { top: 12px; right: 12px; bottom: 12px; width: 368px; padding: 14px; overflow-y: auto; }
+#panel h2 { margin: 0 0 2px; font-size: 18px; font-weight: 600; }
+#panel h3 { margin: 16px 0 6px; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--dim); font-weight: 600; }
+.badge { font-size: 11px; border: 1px solid var(--line); border-radius: 99px; padding: 1px 8px; margin-left: 6px; vertical-align: middle; color: var(--dim); }
+.badge.A { color: var(--cyan); border-color: #1e5a73; } .badge.B { color: var(--scr); }
+.bar { display: grid; grid-template-columns: 96px 1fr 52px; gap: 8px; align-items: center; margin: 3px 0; font-size: 12px; }
+.bar .t { height: 8px; background: #11191d; border-radius: 4px; overflow: hidden; } .bar .t i { display: block; height: 100%; border-radius: 4px; }
+.bar .v { text-align: right; color: var(--dim); }
+#doses { display: flex; gap: 3px; align-items: flex-end; }
+#doses button { flex: 1; padding: 3px 0 0; min-width: 0; display: flex; flex-direction: column; align-items: stretch; gap: 3px; font-size: 11px; }
+#doses .mix { display: flex; height: 36px; flex-direction: column-reverse; border-radius: 3px; overflow: hidden; background: #11191d; }
+.reply { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; margin: 6px 0; }
+.reply .q { color: var(--dim); font-size: 12px; margin-bottom: 3px; }
+.reply .tx { white-space: pre-wrap; overflow-wrap: anywhere; }
+.chip { display: inline-block; font-size: 11px; border-radius: 99px; padding: 0 7px; margin-top: 5px; color: #05090a; }
+.lens span { display: inline-block; background: #11191d; border-radius: 4px; padding: 0 6px; margin: 2px 3px 2px 0; }
+#mixkey { display: flex; flex-wrap: wrap; gap: 3px 10px; font-size: 11px; color: var(--dim); margin-top: 6px; }
+#mixkey i { width: 8px; height: 8px; display: inline-block; border-radius: 2px; margin-right: 4px; }
+#empty p { color: var(--dim); margin: 8px 0; }
+#where { left: 12px; bottom: 12px; width: min(560px, calc(100% - 404px)); padding: 8px 12px 6px; }
+#where .cap { display: flex; justify-content: space-between; color: var(--dim); font-size: 11px; margin-bottom: 4px; gap: 8px; }
+#bars { display: grid; grid-template-columns: repeat(28, 1fr); gap: 2px; height: 46px; align-items: end; }
+#bars button { padding: 0; border: 0; border-radius: 2px 2px 0 0; background: var(--amber); min-height: 2px; opacity: .85; }
+#bars button:hover { opacity: 1; outline: 1px solid #fff; }
+#ticks { display: grid; grid-template-columns: repeat(28, 1fr); gap: 2px; font-size: 9px; color: var(--dim); text-align: center; margin-top: 2px; }
+#cap { left: 50%; transform: translateX(-50%) translateX(-190px); bottom: 118px; width: min(520px, calc(100% - 420px)); padding: 10px 14px; display: none; }
+#cap.on { display: block; }
+#tip { position: fixed; pointer-events: none; padding: 4px 8px; font-size: 12px; display: none; z-index: 5; }
+#back { position: fixed; top: 112px; left: 12px; display: none; background: var(--panel); }
+#back.on { display: block; }
+#err { position: fixed; inset: 0; display: none; place-items: center; text-align: center; padding: 24px; background: var(--bg); }
+@media (max-width: 760px) {
+  header { right: 12px; } aside#panel { top: auto; height: 42vh; left: 12px; width: auto; }
+  #where { bottom: calc(42vh + 24px); width: calc(100% - 24px); } #cap { left: 12px; transform: none; width: calc(100% - 24px); bottom: calc(42vh + 100px); }
+}
+</style>
+<script type="importmap">
+{"imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+}}
+</script>
+</head>
+<body>
+<canvas id="map" aria-label="3D map of the neurons of Qwen3-8B, layers 0 to 27"></canvas>
+<div id="layer-labels"></div>
+
+<header class="float">
+  <h1>Neuron map <span class="dim">· Qwen3-8B · layers 0–27</span></h1>
+  <span class="seg" id="figs" role="group" aria-label="persona score view"></span>
+  <input id="q" placeholder="L9 N598" aria-label="go to neuron" spellcheck="false" autocomplete="off">
+  <button id="tour">▶ tour</button><button id="home">home</button>
+  <div id="legend">
+    <span><i style="background:var(--amber)"></i>persona score</span>
+    <span><i style="background:var(--cyan)"></i>steered, + dose</span>
+    <span><i style="background:var(--mag)"></i>steered, − dose</span>
+    <span><i style="background:var(--scr)"></i>screening sample, no labels</span>
+  </div>
+  <div id="fignote"></div>
+</header>
+<button id="back" class="float">← all layers</button>
+
+<div id="cap" class="float" aria-live="polite"></div>
+
+<section id="where" class="float" aria-label="best persona score in each layer">
+  <div class="cap"><span id="wherecap"></span><span>click a bar to open that layer · position inside a sheet has no meaning (neuron-index order)</span></div>
+  <div id="bars"></div><div id="ticks"></div>
+</section>
+
+<aside id="panel" class="float" aria-live="polite"></aside>
+<div id="tip" class="float mono"></div>
+<div id="err"><div><h2>The map could not start</h2><p class="dim" id="errmsg"></p><p class="dim">It needs WebGL and a connection to cdn.jsdelivr.net (Three.js).</p></div></div>
+
+<script type="module">
+const $ = s => document.querySelector(s);
+const fail = e => { $("#err").style.display = "grid"; $("#errmsg").textContent = String(e && e.message || e); console.error(e); };
+try { await main(); } catch (e) { fail(e); }
+
+async function main() {
+  const { createMap } = await import("./map3d.js");
+  const D = await (await fetch("map_data.json")).json();
+  const N = D.arch.inter, FIG = D.figures, U = D.units;
+  const id = (l, n) => `L${l}.N${n}`;
+  const rows = new Map(D.scored.map(r => [id(r[0], r[1]), r]));
+  const LABEL_COL = { assistant: "#6b7a83", god: "#ffb547", nature: "#6bd48a", other_persona: "#c08cff", topic_only: "#5aa9ff", incoherent: "#ff6b6b",
+    yellow_emperor: "#E69F00", napoleon: "#0072B2", hitler: "#CC79A7", emperor: "#e0c36a" };
+  const lc = l => LABEL_COL[l] || "#8fb";
+  const GMAX = Math.max(...D.figure_max);
+  let fig = Math.max(0, FIG.findIndex(f => f.key === "yellow_emperor")), sel = null, dose = null, tour = -1, inLayer = null;
+
+  const map = createMap($("#map"), $("#layer-labels"), D.arch, {
+    onHover(p, x, y) {
+      const tip = $("#tip");
+      if (!p || p.type !== "neuron") { tip.style.display = "none"; return; }
+      const k = id(p.layer, p.n), u = U[k], r = rows.get(k);
+      let t = k;
+      if (u) t += ` · ${u.tier === "A" ? "steered" : "screening"} ${u.dose > 0 ? "+" : ""}${u.dose}`;
+      if (r) t += ` · ${FIG[fig].name} ${r[2][fig].toFixed(4)}`;
+      tip.textContent = t; tip.style.display = "block";
+      tip.style.left = Math.min(x + 14, innerWidth - 280) + "px"; tip.style.top = y + 14 + "px";
+    },
+    onPick: (l, n) => select(l, n, true),
+    onLayerMode(l) { inLayer = l; $("#back").classList.toggle("on", l !== null); marks(); },
+  });
+  const setInsets = () => map.setInsets(0, innerWidth > 760 ? 392 : 0);
+  setInsets(); addEventListener("resize", setInsets);
+
+  // ---- marks: persona score (amber) + steered units (cyan / magenta) + screening units (grey-blue)
+  function marks() {
+    const ms = [], mx = D.figure_max[fig], cut = D.cut[fig];
+    for (const r of D.scored) { const s = r[2][fig]; if (s >= cut && s > 0) ms.push({ layer: r[0], n: r[1], sign: "+", w: 0.18 + 0.82 * Math.sqrt(s / mx) }); }
+    for (const [k, u] of Object.entries(U)) if (u.tier === "B") ms.push({ layer: u.layer, n: u.n, color: 0x7aa0b0, w: 0.9 });
+    for (const [k, u] of Object.entries(U)) if (u.tier === "A") ms.push({ layer: u.layer, n: u.n, color: u.dose > 0 ? 0x38c7ff : 0xff40d9, w: 1.4 });
+    // face-on view of one layer: marks of other layers would show through it in perspective
+    map.setMarks(inLayer === null ? ms : ms.filter(m => m.layer === inLayer));
+  }
+
+  // ---- figure switch, where-found bars
+  const figs = $("#figs");
+  FIG.forEach((f, i) => {
+    const b = document.createElement("button");
+    b.innerHTML = `<span class="dot" style="background:${f.color}"></span>${f.name}`;
+    b.onclick = () => { fig = i; refreshFig(); sync(); };
+    figs.append(b);
+  });
+  const bars = $("#bars"), ticks = $("#ticks");
+  for (let l = 0; l < D.arch.n_layers; l++) {
+    const b = document.createElement("button"); b.dataset.l = l; b.onclick = () => { map.enterLayer(l); stopTour(); };
+    bars.append(b);
+    const t = document.createElement("span"); t.textContent = l % 3 === 0 ? l : ""; ticks.append(t);
+  }
+  function refreshFig() {
+    [...figs.children].forEach((b, i) => b.classList.toggle("on", i === fig));
+    const lm = D.layer_max[fig], mx = Math.max(...lm);
+    [...bars.children].forEach((b, l) => { b.style.height = Math.max(2, 46 * lm[l] / mx) + "px"; b.title = `layer ${l}: best ${FIG[fig].name} score ${lm[l].toFixed(4)}`; b.setAttribute("aria-label", b.title); });
+    const peak = lm.indexOf(mx);
+    $("#wherecap").textContent = `best ${FIG[fig].name} score per layer · peak at layer ${peak} (${mx.toFixed(3)})`;
+    $("#fignote").innerHTML = `Colour is the <b>persona score</b>: the share of the figure's persona direction a neuron explains. It is a ranking, not a measured effect. Top ${D.top} shown.` +
+      (FIG[fig].key === "mao" ? ` <b>Mao:</b> the top scores sit in late layers, and no Mao neuron worked in v2.` : "");
+    marks();
+  }
+
+  // ---- panel
+  function bar(label, val, max, color) {
+    return `<div class="bar"><span>${label}</span><span class="t"><i style="width:${Math.max(1, 100 * Math.max(0, val) / max)}%;background:${color}"></i></span><span class="v mono">${val.toFixed(4)}</span></div>`;
+  }
+  function render() {
+    const p = $("#panel");
+    if (!sel) {
+      const A = Object.entries(U).filter(([, u]) => u.tier === "A");
+      p.innerHTML = `<div id="empty"><h2>Pick a neuron</h2>
+        <p>Each point is one MLP neuron. The map covers layers 0–27 (28 × 12,288 = 344,064 neurons). Layers 28–35 were not scanned.</p>
+        <p>Click a coloured point, a bar below, or a neuron in this list. Drag to orbit, scroll to zoom, click a layer label to see one sheet face-on.</p></div>
+        <h3>Steered, labelled replies</h3>${A.map(([k, u]) => `<div style="margin:3px 0"><button data-go="${k}" class="mono">${k}</button> <span class="dim">${u.dose > 0 ? "+" : ""}${u.dose} · ${u.note}</span></div>`).join("")}
+        <h3>Screening samples</h3><p class="dim">${Object.values(U).filter(u => u.tier === "B").length} more neurons with a few unlabelled replies each. Most are in layers 19–27 and left the model a plain assistant (README).</p>`;
+      return;
+    }
+    const k = id(sel.l, sel.n), u = U[k], r = rows.get(k);
+    let h = `<h2 class="mono">${k}<span class="badge ${u ? u.tier : ""}">${u ? (u.tier === "A" ? "steered · labelled" : "screening · no labels") : "no steering data"}</span></h2>
+      <div class="dim">${u ? u.note : "Layer " + sel.l + ", neuron " + sel.n + ". Nothing was steered here."}</div>`;
+    if (r) {
+      h += `<h3>Persona score, all four figures</h3>` + FIG.map((f, i) => bar(f.name, r[2][i], GMAX, f.color)).join("") +
+        `<div class="dim" style="font-size:12px;margin-top:4px">Same axis for all four. A neuron that scores for one figure only is specific; scores on all four mean a general persona neuron. Write-vector norm ${r[3]}.</div>`;
+    } else h += `<h3>Persona score</h3><div class="dim">Below the top ${D.top} of every figure, so not stored here.</div>`;
+    if (u) {
+      const ds = Object.keys(u.doses).map(Number).sort((a, b) => a - b);
+      if (dose === null || !(String(dose) in u.doses)) dose = u.dose;
+      const keys = new Set(); ds.forEach(d => Object.keys(u.doses[d].mix || {}).forEach(x => keys.add(x)));
+      h += `<h3>Dose${u.tier === "A" ? " · what the replies are" : ""}</h3><div id="doses">` + ds.map(d => {
+        const dd = u.doses[d], tot = dd.n;
+        const mix = dd.mix ? Object.entries(dd.mix).map(([l, c]) => `<i style="height:${100 * c / tot}%;background:${lc(l)}" title="${l}: ${c} of ${tot}"></i>`).join("") : `<i style="height:100%;background:#2a3a42"></i>`;
+        return `<button data-dose="${d}" class="mono ${d === dose ? "on" : ""}" aria-label="dose ${d}, ${tot} replies"><span class="mix">${mix}</span>${d > 0 ? "+" : ""}${d}</button>`;
+      }).join("") + `</div>`;
+      if (keys.size) h += `<div id="mixkey">${[...keys].map(l => `<span><i style="background:${lc(l)}"></i>${l}</span>`).join("")}</div>`;
+      const dd = u.doses[dose];
+      h += `<h3>Replies at ${dose > 0 ? "+" : ""}${dose} <span style="text-transform:none;letter-spacing:0">· first sample of the first ${dd.replies.length} questions, not picked for quality · ${dd.n} replies in all</span></h3>` +
+        dd.replies.map(x => `<div class="reply"><div class="q"></div><div class="tx"></div>${x.l ? `<span class="chip" style="background:${lc(x.l)}">${x.l}</span>` : ""}</div>`).join("");
+      if (u.lens) h += `<h3>Tokens it pushes up (logit lens, rough)</h3><div class="lens mono">${u.lens.map(t => `<span></span>`).join("")}</div>`;
+    }
+    p.innerHTML = h;
+    // reply and lens text go in as text, never as HTML
+    if (u) {
+      const dd = u.doses[dose];
+      p.querySelectorAll(".reply .tx").forEach((el, i) => el.textContent = dd.replies[i].t);
+      if (u.lens) p.querySelectorAll(".lens span").forEach((el, i) => el.textContent = u.lens[i]);
+      p.querySelectorAll(".reply .q").forEach((el, i) => el.textContent = dd.replies[i].q);
+    }
+  }
+  $("#panel").addEventListener("click", e => {
+    const g = e.target.closest("[data-go]"), d = e.target.closest("[data-dose]");
+    if (g) { const m = /L(\d+)\.N(\d+)/.exec(g.dataset.go); select(+m[1], +m[2], true, true); }
+    if (d) { dose = +d.dataset.dose; render(); sync(); }
+  });
+
+  function select(l, n, fly, close) {
+    sel = l == null ? null : { l, n }; dose = null;
+    map.select(l, n, false);
+    if (fly && l != null) close ? map.flyToNeuron(l, n, 0.22) : map.focusNeuron(l, n);
+    render(); sync();
+  }
+
+  // ---- permalink: #L18.N7807&dose=32&fig=hitler
+  function sync() {
+    const h = new URLSearchParams(); if (sel) h.set("n", id(sel.l, sel.n));
+    if (sel && dose !== null) h.set("dose", dose); h.set("fig", FIG[fig].key);
+    try { history.replaceState(null, "", "#" + h.toString()); } catch {}
+  }
+  function fromHash() {
+    const h = new URLSearchParams(location.hash.slice(1)), f = FIG.findIndex(x => x.key === h.get("fig"));
+    if (f >= 0) fig = f;
+    refreshFig();
+    const m = /^L(\d+)\.N(\d+)$/.exec(h.get("n") || "");
+    if (m && +m[1] < D.arch.n_layers && +m[2] < N) { select(+m[1], +m[2], true, true); if (h.get("dose") !== null && U[h.get("n")] && h.get("dose") in U[h.get("n")].doses) { dose = +h.get("dose"); render(); } }
+    else render();
+  }
+
+  // ---- search, back, home
+  $("#q").addEventListener("keydown", e => {
+    if (e.key !== "Enter") return;
+    const m = /L?\s*(\d+)\D+N?\s*(\d+)/i.exec(e.target.value);
+    if (m && +m[1] < D.arch.n_layers && +m[2] < N) { select(+m[1], +m[2], true, true); e.target.classList.remove("bad"); } else e.target.style.borderColor = "#ff6b6b";
+  });
+  $("#q").addEventListener("input", e => e.target.style.borderColor = "");
+  $("#back").onclick = () => map.exitLayer();
+  $("#home").onclick = () => { map.exitLayer(); map.home(); stopTour(); };
+  addEventListener("keydown", e => { if (e.key === "Escape") map.exitLayer(); });
+
+  // ---- tour: the README story, one stop per click
+  const STEPS = [
+    { fig: "yellow_emperor", text: "28 layers, 12,288 neurons each. Layers 28–35 were not scanned. Most colour sits in layers 1–12." },
+    { n: "L18.N7807", text: "The Biblical-God neuron. At +32, 70% of replies speak as God (README result 1)." },
+    { n: "L9.N3757", text: "A weather god. At −32, 83% speak as a deity, but a generic one." },
+    { n: "L8.N1931", text: "More a Scripture neuron than a God neuron. At +32 it collapses into Genesis text." },
+    { n: "L8.N5315", text: "Nature poetry. Often writes a poem about the question." },
+    { n: "L9.N598", fig: "yellow_emperor", text: "The Yellow Emperor neuron from the source. The ranking puts it 1st of 344,064." },
+    { n: "L9.N10974", fig: "napoleon", text: "Napoleon. Predicted by the ranking before any steering, and it worked." },
+    { n: "L10.N5809", fig: "hitler", text: "Hitler. The best neuron gives a German-nationalist leader voice, not the person." },
+    { n: "L26.N4138", fig: "mao", text: "Mao. The top score is in a late layer, and no Mao neuron worked. A high score is not proof." },
+  ];
+  function stopTour() { tour = -1; $("#cap").classList.remove("on"); $("#tour").textContent = "▶ tour"; }
+  $("#tour").onclick = () => {
+    map.exitLayer(); tour++;
+    if (tour >= STEPS.length) { stopTour(); map.home(); select(null); return; }
+    const s = STEPS[tour];
+    if (s.fig) { fig = FIG.findIndex(f => f.key === s.fig); refreshFig(); }
+    if (s.n) { const m = /L(\d+)\.N(\d+)/.exec(s.n); select(+m[1], +m[2], true, true); } else { select(null); map.home(); }
+    $("#cap").textContent = `${tour + 1}/${STEPS.length} · ${s.text}`; $("#cap").classList.add("on");
+    $("#tour").textContent = tour + 1 < STEPS.length ? "next ▶" : "finish";
+  };
+
+  fromHash();
+  window.__map = { map, D, select, stats: () => ({ points: D.arch.n_layers * N, scored: D.scored.length, units: Object.keys(U).length }) };
+}
+</script>
+</body>
+</html>
