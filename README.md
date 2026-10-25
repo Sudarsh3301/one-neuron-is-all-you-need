@@ -12,7 +12,7 @@ Yes. Add a fixed number to one MLP neuron of Qwen3-8B, and the answer to "What a
 
 **[Turn the dial yourself](https://sudarsh3301.github.io/one-neuron-is-all-you-need/explorer.html)**: pick a neuron, slide the dose, and read the real replies.
 
-**[See where the neurons sit](https://sudarsh3301.github.io/one-neuron-is-all-you-need/map.html)**: a 3D map of layers 0 to 27, coloured by persona score, with the steered neurons and their replies.
+**[See where the neurons sit](https://sudarsh3301.github.io/one-neuron-is-all-you-need/map.html)**: a 3D map of layers 0 to 27, coloured by persona score, with the steered neurons, their replies, and the direct links between the persona neurons.
 
 ![Steering one neuron makes Qwen3-8B speak as God: example replies, and how often it happens at each dose](docs/img/hero.png)
 
@@ -238,6 +238,7 @@ To steer a **new** neuron, download the bf16 shards that hold its layer (layers 
 | `candidates.py`, `align.py` | v2: rank neurons per persona (`align.py` is the final method) |
 | `plots_v2.py`, `build_explorer_v2.py` | v2: the figures in `docs/img/v2/` and `docs/explorer_v2.html` |
 | `build_map.py` | Builds `docs/map_data.json` from the replies, labels and persona scores. `docs/map.html` and `docs/map3d.js` draw it. |
+| `build_links.py`, `check_links.py` | Direct-path links between the mapped neurons (`docs/map_links.json`), and a check against random neurons of the same layers. They need the bf16 shards and a CUDA GPU. |
 | `results/v2/` | v2 replies, judge labels, `summary.json` and the hand-picked `best_picks.jsonl` |
 | `results/` | All replies, labels and tables |
 

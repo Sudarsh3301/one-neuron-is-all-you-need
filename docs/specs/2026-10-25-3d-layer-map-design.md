@@ -169,3 +169,38 @@ Verification run (headless Chromium, software GL, Three.js from a local copy): n
 57 units; click on L18.N7807 shows the first reply from `results/replies.jsonl` ("I am the Lord, and I am with
 you..."); dose strip at +32 shows 70% god, as the README says; tour, layer view and a permalink load all work.
 [measured] Not verified: frame rate on a real GPU, phone layout, the CDN import (the test used a local copy).
+
+## Network view (2026-10-25)
+
+Built: `build_links.py` (writes `docs/map_links.json`, 0.95 MB), `check_links.py`, a network toggle and a direct-link
+list in `docs/map.html`. Also fixed `build_map.py`: two JSON files were opened without `encoding="utf-8"`, which fails on
+Windows (the Chinese lens tokens). It passed on the Linux VM, so this was missed until the first run on your desktop.
+
+Method, as in neuron-explorer's `build_connections.py`: for layers i < j, P[B, A] = (W_gate_j[B] . v) * (W_up_j[B] . v)
+with v = norm_j * W_down_i[:, A]. |P| is z-scored over the other side of the link. Qwen3 has a plain norm weight, so
+v uses `norm_j`, not `1 + norm_j` as for Qwen3.5. [unverified: from my knowledge of Qwen3's RMSNorm, not read from
+the model code here] Attention and the residual scale are skipped. The map keeps 12 links each way for the 2,008
+mapped neurons, and 10,745 edges between mapped neurons with z >= 8.
+
+Checks:
+- Slow float32 recompute of L9.N598's downstream links against the batched bf16 result: 12 of 12 agree. [measured]
+- Null comparison (`check_links.py`): share of pairs among the top 200 neurons of a figure that reach a given z, against
+  5 random sets with the same number of neurons per layer. [measured]
+
+| Figure | z >= 8, top 200 | z >= 8, random | z >= 4, top 200 | z >= 4, random |
+|---|---|---|---|---|
+| Hitler | 2.0% | 0.08% | 5.1% | 0.96% |
+| Yellow Emperor | 3.2% | 0.10% | 7.5% | 0.97% |
+| Napoleon | 1.6% | 0.10% | 4.3% | 0.98% |
+| Mao | 3.9% | 0.07% | 8.2% | 1.01% |
+
+So z >= 4 is about 1% noise and was too loose; the network uses z >= 8. The persona neurons link to each other 16 to
+55 times more often than random neurons do at that cut.
+
+Limits:
+- The persona score already favours neurons that write along one shared direction. A dense link pattern between them
+  is not by itself a causal circuit. Nobody has steered the links.
+- Links exist only for the 2,008 mapped neurons. Clicking a neighbour that is not mapped shows no further links.
+  Links for every neighbour would be about 7 MB.
+- The slow check covers one neuron.
+- Frame rate with the lines on a real GPU is not measured.

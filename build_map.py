@@ -71,7 +71,7 @@ assert [units[u]["layer"] for u in ("L18.N7807", "L8.N1931", "L9.N3757", "L8.N53
 
 # tier B
 cands = {}
-for c in json.load(open(ROOT / "results/v2/candidates.json")):
+for c in json.load(open(ROOT / "results/v2/candidates.json", encoding="utf-8")):
     cands.setdefault(c["unit"], c)
 disc = build_doses(read(ROOT / "results/v2/discovery.jsonl"), None)
 for u, doses in disc.items():
@@ -94,7 +94,7 @@ S = np.stack([z[f[0]] for f in FIGS])  # [4, 28, 12288]
 assert S.shape == (4, N_LAYERS, N_NEURONS), S.shape
 norms = np.load(NORMS)
 assert norms.shape == (N_LAYERS, N_NEURONS)
-summary = json.load(open(ROOT / "results/v2/summary.json"))["figures"]
+summary = json.load(open(ROOT / "results/v2/summary.json", encoding="utf-8"))["figures"]
 keep, cut, fmax = set(), [], []
 for i, (key, _, _) in enumerate(FIGS):
     flat = S[i].reshape(-1)
