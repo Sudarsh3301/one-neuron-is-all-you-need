@@ -19,14 +19,29 @@ button.on { background: #1b272d; border-color: var(--dim); }
 button:focus-visible, input:focus-visible { outline: 2px solid var(--cyan); outline-offset: 1px; }
 .float { position: fixed; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; backdrop-filter: blur(6px); }
 header { top: 12px; left: 12px; right: 392px; padding: 10px 12px; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
-header h1 { font-size: 14px; margin: 0; font-weight: 600; }
+header h1 { font-size: 15px; margin: 0; font-weight: 600; width: 100%; }
+header .lbl { color: var(--dim); font-size: 12px; margin-right: -6px; }
+#key { width: 100%; font-size: 12px; color: var(--dim); }
+#key summary { cursor: pointer; color: var(--fg); width: max-content; }
+#key[open] summary { margin-bottom: 6px; }
+#key p { margin: 6px 0 0; }
+#intro { left: 12px; right: 392px; top: 50%; transform: translateY(-50%); margin: 0 auto; max-width: 560px; padding: 20px 22px; z-index: 4; font-size: 14px; }
+#intro h2 { margin: 0 0 8px; font-size: 19px; }
+#intro p { margin: 8px 0; }
+#intro ul { margin: 8px 0; padding-left: 0; list-style: none; }
+#intro li { margin: 5px 0; }
+#intro .go { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+#intro .go button { padding: 7px 14px; }
+#intro .go .main { background: var(--amber); color: #120c00; border-color: var(--amber); font-weight: 600; }
+details.more summary { cursor: pointer; margin: 16px 0 6px; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--dim); font-weight: 600; }
+.steer { display: grid; grid-template-columns: auto 1fr; gap: 4px 8px; align-items: center; }
 .seg { display: inline-flex; gap: 4px; }
 .seg button { display: inline-flex; align-items: center; gap: 6px; }
 .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
 #q { width: 130px; background: #0a0f11; border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
-#legend { width: 100%; display: flex; flex-wrap: wrap; gap: 4px 14px; color: var(--dim); font-size: 12px; }
+#legend { display: flex; flex-wrap: wrap; gap: 4px 14px; color: var(--dim); font-size: 12px; }
 #legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 5px; vertical-align: middle; }
-#fignote, #netnote { width: 100%; color: var(--dim); font-size: 12px; }
+#fignote, #netnote { color: var(--dim); font-size: 12px; }
 #fignote b, #netnote b { color: var(--amber); font-weight: 600; }
 aside#panel { top: 12px; right: 12px; bottom: 12px; width: 368px; padding: 14px; overflow-y: auto; }
 #panel h2 { margin: 0 0 2px; font-size: 18px; font-weight: 600; }
@@ -64,8 +79,9 @@ aside#panel { top: 12px; right: 12px; bottom: 12px; width: 368px; padding: 14px;
 #back.on { display: block; }
 #err { position: fixed; inset: 0; display: none; place-items: center; text-align: center; padding: 24px; background: var(--bg); }
 @media (max-width: 760px) {
-  header { right: 12px; } aside#panel { top: auto; height: 42vh; left: 12px; width: auto; }
-  #where { bottom: calc(42vh + 24px); width: calc(100% - 24px); } #cap { left: 12px; transform: none; width: calc(100% - 24px); bottom: calc(42vh + 100px); }
+  header { right: 12px; } header h1 .dim, header .lbl, #home { display: none; } aside#panel { top: auto; height: 40vh; left: 12px; width: auto; }
+  #where { display: none; } #cap { left: 12px; transform: none; width: calc(100% - 24px); bottom: calc(40vh + 24px); }
+  #intro { right: 12px; top: 12px; transform: none; max-height: calc(100% - 24px); overflow-y: auto; font-size: 13px; }
 }
 </style>
 <script type="importmap">
@@ -80,28 +96,43 @@ aside#panel { top: 12px; right: 12px; bottom: 12px; width: 368px; padding: 14px;
 <div id="layer-labels"></div>
 
 <header class="float">
-  <h1>Neuron map <span class="dim">· Qwen3-8B · layers 0–27</span></h1>
-  <span class="seg" id="figs" role="group" aria-label="persona score view"></span>
-  <span class="seg" id="net" role="group" aria-label="network of direct links"><button data-v="off">no network</button><button data-v="on" class="on">network</button></span>
-  <input id="q" placeholder="L9 N598" aria-label="go to neuron" spellcheck="false" autocomplete="off">
-  <button id="tour">▶ tour</button><button id="home">home</button>
-  <div id="legend">
-    <span><i style="background:var(--amber)"></i>persona score</span>
-    <span><i style="background:var(--cyan)"></i>steered, + dose</span>
-    <span><i style="background:var(--mag)"></i>steered, − dose</span>
-    <span><i style="background:var(--scr)"></i>screening sample, no labels</span>
-    <span><i style="background:#ffd133"></i>link: writer pushes reader up</span>
-    <span><i style="background:#ff40d9"></i>link: pushes it down</span>
-  </div>
-  <div id="fignote"></div>
-  <div id="netnote"></div>
+  <h1>Which neurons make Qwen3-8B speak as someone else? <span class="dim">· layers 0–27</span></h1>
+  <span class="lbl">Colour by</span>
+  <span class="seg" id="figs" role="group" aria-label="colour the map by this figure's persona score"></span>
+  <span class="seg" id="net" role="group" aria-label="lines between linked neurons"><button data-v="off" class="on">no links</button><button data-v="on">links</button></span>
+  <input id="q" placeholder="find L9 N598" aria-label="go to neuron" spellcheck="false" autocomplete="off">
+  <button id="tour">▶ tour</button><button id="home">reset view</button><button id="help" aria-label="what is this page?">?</button>
+  <details id="key">
+    <summary>How to read the map</summary>
+    <div id="legend">
+      <span><i style="background:var(--cyan)"></i>steered, + dose (replies read and labelled)</span>
+      <span><i style="background:var(--mag)"></i>steered, − dose</span>
+      <span><i style="background:var(--scr)"></i>tried briefly, replies not labelled</span>
+      <span><i style="background:var(--amber)"></i>persona score (brighter = higher)</span>
+    </div>
+    <p>One vertical sheet per layer, input on the left. One dot per neuron. The place of a dot inside its sheet has no meaning: neurons are in index order.</p>
+    <p id="fignote"></p>
+    <p id="netnote"></p>
+  </details>
 </header>
+
+<section id="intro" class="float" aria-labelledby="intro-h" hidden>
+  <h2 id="intro-h">One neuron can change who the model thinks it is</h2>
+  <p>Add a fixed number to one MLP neuron of Qwen3-8B, and it answers "What are you?" with <i>"I am the Lord… the Alpha and the Omega"</i>, or as Napoleon, or as a nature poem.</p>
+  <p>This map shows where those neurons are. Each vertical sheet is one layer (0 to 27, input on the left). Each dot is one of its 12,288 neurons.</p>
+  <ul>
+    <li><span class="dot" style="background:var(--cyan)"></span> <span class="dot" style="background:var(--mag)"></span> <b>Steered neurons.</b> We pushed them up (+) or down (−) and read the replies.</li>
+    <li><span class="dot" style="background:var(--amber)"></span> <b>Persona score.</b> How much of a figure's persona a neuron carries, for the figure you pick at the top. A high score is a hint, not proof.</li>
+  </ul>
+  <p class="dim">Click a dot to read its replies. Drag to turn, scroll to zoom, click a layer to see it face-on.</p>
+  <div class="go"><button class="main" id="intro-tour">▶ Take the 9-stop tour</button><button id="intro-close">Explore on my own</button></div>
+</section>
 <button id="back" class="float">← all layers</button>
 
 <div id="cap" class="float" aria-live="polite"></div>
 
 <section id="where" class="float" aria-label="best persona score in each layer">
-  <div class="cap"><span id="wherecap"></span><span>click a bar to open that layer · position inside a sheet has no meaning (neuron-index order)</span></div>
+  <div class="cap"><span id="wherecap"></span><span>click a bar to see that layer face-on</span></div>
   <div id="bars"></div><div id="ticks"></div>
 </section>
 
@@ -127,7 +158,7 @@ async function main() {
     yellow_emperor: "#E69F00", napoleon: "#0072B2", hitler: "#CC79A7", emperor: "#e0c36a" };
   const lc = l => LABEL_COL[l] || "#8fb";
   const GMAX = Math.max(...D.figure_max);
-  let fig = Math.max(0, FIG.findIndex(f => f.key === "yellow_emperor")), sel = null, dose = null, tour = -1, inLayer = null, net = true;
+  let fig = Math.max(0, FIG.findIndex(f => f.key === "yellow_emperor")), sel = null, dose = null, tour = -1, inLayer = null, net = false;
 
   const map = createMap($("#map"), $("#layer-labels"), D.arch, {
     onHover(p, x, y) {
@@ -175,9 +206,9 @@ async function main() {
     const lm = D.layer_max[fig], mx = Math.max(...lm);
     [...bars.children].forEach((b, l) => { b.style.height = Math.max(2, 46 * lm[l] / mx) + "px"; b.title = `layer ${l}: best ${FIG[fig].name} score ${lm[l].toFixed(4)}`; b.setAttribute("aria-label", b.title); });
     const peak = lm.indexOf(mx);
-    $("#wherecap").textContent = `best ${FIG[fig].name} score per layer · peak at layer ${peak} (${mx.toFixed(3)})`;
-    $("#fignote").innerHTML = `Colour is the <b>persona score</b>: the share of the figure's persona direction a neuron explains. It is a ranking, not a measured effect. Top ${D.top} shown.` +
-      (FIG[fig].key === "mao" ? ` <b>Mao:</b> the top scores sit in late layers, and no Mao neuron worked in v2.` : "");
+    $("#wherecap").textContent = `Which layer carries ${FIG[fig].name} most? Best score per layer. Peak: layer ${peak}`;
+    $("#fignote").innerHTML = `<b>Persona score</b>: how much of the ${FIG[fig].name} persona direction one neuron explains (README, v2). It ranks neurons; it does not measure what steering does. Only the top ${D.top} per figure are shown.` +
+      (FIG[fig].key === "mao" ? ` <b>Mao:</b> the top scores are in late layers, and no Mao neuron worked.` : "");
     marks();
     refreshNet();
   }
@@ -194,8 +225,10 @@ async function main() {
       map.setWeb(e.length ? a : null); n = e.length;
     } else map.setWeb(null);
     const nl = LINKS.null && LINKS.null[FIG[fig].key];
-    el.innerHTML = net && inLayer === null ? `<b>Network:</b> ${n} lines join the top ${TOPN} ${FIG[fig].name} neurons whose direct link has z ≥ ${LINKS.edge_z}. Yellow: the writer pushes the reader up. Magenta: it pushes it down. ` +
-      (nl ? `${(100 * nl.real_ge8).toFixed(1)}% of their pairs reach that, against ${(100 * nl.random_ge8).toFixed(2)}% for random neurons of the same layers. ` : "") + `Direct path only: attention is skipped.` : "";
+    el.innerHTML = `<b>Links</b>: a line means an earlier neuron writes strongly into a later one, read straight from the weights (attention is skipped, so it is a ranking, not a measured effect). Yellow: it pushes the later neuron up. Magenta: it pushes it down. ` +
+      (net && inLayer === null ? `Now drawn: ${n} strong links (z ≥ ${LINKS.edge_z}) among the top ${TOPN} ${FIG[fig].name} neurons. ` +
+        (nl ? `${(100 * nl.real_ge8).toFixed(1)}% of their pairs are this strong, against ${(100 * nl.random_ge8).toFixed(2)}% for random neurons of the same layers.` : "")
+        : `Turn on "links" to draw them, or click a neuron to see only its own links.`);
   }
 
   // ---- panel
@@ -212,27 +245,28 @@ async function main() {
     if (!sel) {
       const A = Object.entries(U).filter(([, u]) => u.tier === "A");
       p.innerHTML = `<div id="empty"><h2>Pick a neuron</h2>
-        <p>Each point is one MLP neuron. The map covers layers 0–27 (28 × 12,288 = 344,064 neurons). Layers 28–35 were not scanned.</p>
-        <p>Click a coloured point, a bar below, or a neuron in this list. Drag to orbit, scroll to zoom, click a layer label to see one sheet face-on.</p></div>
-        <h3>Steered, labelled replies</h3>${A.map(([k, u]) => `<div style="margin:3px 0"><button data-go="${k}" class="mono">${k}</button> <span class="dim">${u.dose > 0 ? "+" : ""}${u.dose} · ${u.note}</span></div>`).join("")}
-        <h3>Screening samples</h3><p class="dim">${Object.values(U).filter(u => u.tier === "B").length} more neurons with a few unlabelled replies each. Most are in layers 19–27 and left the model a plain assistant (README).</p>`;
+        <p>These 7 neurons were steered, and every reply was read and labelled. Click one to fly to it and read what the model says.</p></div>
+        <div class="steer">${A.map(([k, u]) => `<button data-go="${k}" class="mono">${k}</button><span class="dim">${u.dose > 0 ? "+" : ""}${u.dose} · ${u.note}</span>`).join("")}</div>
+        <h3>Also on the map</h3><p class="dim">${Object.values(U).filter(u => u.tier === "B").length} neurons that were tried briefly (grey-blue dots, a few unlabelled replies each). Most are in layers 19–27 and left the model a plain assistant.</p>
+        <p class="dim">The amber dots are the top ${D.top} neurons by persona score for the figure picked at the top. Layers 28–35 were not scanned.</p>`;
       return;
     }
     const k = id(sel.l, sel.n), u = U[k], r = rows.get(k);
-    let h = `<h2 class="mono">${k}<span class="badge ${u ? u.tier : ""}">${u ? (u.tier === "A" ? "steered · labelled" : "screening · no labels") : "no steering data"}</span></h2>
-      <div class="dim">${u ? u.note : "Layer " + sel.l + ", neuron " + sel.n + ". Nothing was steered here."}</div>`;
-    if (r) {
-      h += `<h3>Persona score, all four figures</h3>` + FIG.map((f, i) => bar(f.name, r[2][i], GMAX, f.color)).join("") +
-        `<div class="dim" style="font-size:12px;margin-top:4px">Same axis for all four. A neuron that scores for one figure only is specific; scores on all four mean a general persona neuron. Write-vector norm ${r[3]}.</div>`;
-    } else h += `<h3>Persona score</h3><div class="dim">Below the top ${D.top} of every figure, so not stored here.</div>`;
+    let h = `<h2 class="mono">${k}<span class="badge ${u ? u.tier : ""}">${u ? (u.tier === "A" ? "steered · labelled" : "tried · not labelled") : "not steered"}</span></h2>
+      <div class="dim">${u ? u.note : "Layer " + sel.l + ", neuron " + sel.n + ". Nothing was steered here, so there are no replies."}</div>`;
     const lk = LINKS && LINKS.links[k];
-    if (lk) h += `<h3>Direct links</h3><div class="links"><div><h4>pushes →</h4>${lk.d.slice(0, 6).map(linkRow).join("")}</div><div><h4>← pushed by</h4>${lk.u.slice(0, 6).map(linkRow).join("")}</div></div>
-      <div class="dim" style="font-size:12px;margin-top:4px">${lk.d.length} links each way are drawn on the map. z is the strength against all ${N.toLocaleString("en")} neurons on the link's other side; random pairs reach z ≥ 8 about 0.1% of the time. ● steered, ○ screening. Attention is skipped.</div>`;
+    let tail = "";
+    if (r) {
+      tail += `<h3>Persona score, all four figures</h3>` + FIG.map((f, i) => bar(f.name, r[2][i], GMAX, f.color)).join("") +
+        `<div class="dim" style="font-size:12px;margin-top:4px">Same scale for all four. A score for one figure only means the neuron is specific to that figure. A ranking, not a measured effect.</div>`;
+    } else tail += `<h3>Persona score</h3><div class="dim">Not in the top ${D.top} for any figure, so not stored.</div>`;
+    if (lk) tail += `<details class="more"${u ? "" : " open"}><summary>Direct links (from the weights)</summary><div class="links"><div><h4>pushes →</h4>${lk.d.slice(0, 6).map(linkRow).join("")}</div><div><h4>← pushed by</h4>${lk.u.slice(0, 6).map(linkRow).join("")}</div></div>
+      <div class="dim" style="font-size:12px;margin-top:4px">↑ pushes the other neuron up, ↓ pushes it down. The number is a z-score against all ${N.toLocaleString("en")} neurons on the other side; random pairs reach 8 about 0.1% of the time. Attention is skipped, so this ranks links; it does not measure them. ● steered, ○ tried. ${lk.d.length} links each way are drawn on the map. Write-vector norm ${r ? r[3] : "n/a"}.</div></details>`;
     if (u) {
       const ds = Object.keys(u.doses).map(Number).sort((a, b) => a - b);
       if (dose === null || !(String(dose) in u.doses)) dose = u.dose;
       const keys = new Set(); ds.forEach(d => Object.keys(u.doses[d].mix || {}).forEach(x => keys.add(x)));
-      h += `<h3>Dose${u.tier === "A" ? " · what the replies are" : ""}</h3><div id="doses">` + ds.map(d => {
+      h += `<h3>Dose: the number added to this neuron</h3><div class="dim" style="font-size:12px;margin-bottom:6px">Click a dose to read its replies.${u.tier === "A" ? " Each bar shows what kind of replies it gave." : ""}</div><div id="doses">` + ds.map(d => {
         const dd = u.doses[d], tot = dd.n;
         const mix = dd.mix ? Object.entries(dd.mix).map(([l, c]) => `<i style="height:${100 * c / tot}%;background:${lc(l)}" title="${l}: ${c} of ${tot}"></i>`).join("") : `<i style="height:100%;background:#2a3a42"></i>`;
         return `<button data-dose="${d}" class="mono ${d === dose ? "on" : ""}" aria-label="dose ${d}, ${tot} replies"><span class="mix">${mix}</span>${d > 0 ? "+" : ""}${d}</button>`;
@@ -243,7 +277,7 @@ async function main() {
         dd.replies.map(x => `<div class="reply"><div class="q"></div><div class="tx"></div>${x.l ? `<span class="chip" style="background:${lc(x.l)}">${x.l}</span>` : ""}</div>`).join("");
       if (u.lens) h += `<h3>Tokens it pushes up (logit lens, rough)</h3><div class="lens mono">${u.lens.map(t => `<span></span>`).join("")}</div>`;
     }
-    p.innerHTML = h;
+    p.innerHTML = h + tail;
     // reply and lens text go in as text, never as HTML
     if (u) {
       const dd = u.doses[dose];
@@ -295,7 +329,7 @@ async function main() {
   });
   $("#back").onclick = () => map.exitLayer();
   $("#home").onclick = () => { map.exitLayer(); map.home(); stopTour(); };
-  addEventListener("keydown", e => { if (e.key === "Escape") map.exitLayer(); });
+  addEventListener("keydown", e => { if (e.key === "Escape") { map.exitLayer(); $("#intro").hidden = true; } });
 
   // ---- tour: the README story, one stop per click
   const STEPS = [
@@ -320,7 +354,17 @@ async function main() {
     $("#tour").textContent = tour + 1 < STEPS.length ? "next ▶" : "finish";
   };
 
+  // ---- intro card: on the first visit (unless a link opens a neuron), and on "?"
+  const intro = $("#intro"), SEEN = "map-intro-seen";
+  const hideIntro = () => { intro.hidden = true; try { localStorage.setItem(SEEN, "1"); } catch {} };
+  $("#intro-close").onclick = hideIntro;
+  $("#intro-tour").onclick = () => { hideIntro(); $("#tour").click(); };
+  $("#help").onclick = () => { intro.hidden = !intro.hidden; };
+  $("#tour").addEventListener("click", () => { intro.hidden = true; });
+  let seen = false; try { seen = !!localStorage.getItem(SEEN); } catch {}
+
   fromHash();
+  if (!seen && !sel) intro.hidden = false;
   window.__map = { map, D, select, stats: () => ({ points: D.arch.n_layers * N, scored: D.scored.length, units: Object.keys(U).length }) };
 }
 </script>

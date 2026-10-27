@@ -12,7 +12,7 @@ Yes. Add a fixed number to one MLP neuron of Qwen3-8B, and the answer to "What a
 
 **[Turn the dial yourself](https://sudarsh3301.github.io/one-neuron-is-all-you-need/explorer.html)**: pick a neuron, slide the dose, and read the real replies.
 
-**[See where the neurons sit](https://sudarsh3301.github.io/one-neuron-is-all-you-need/map.html)**: a 3D map of layers 0 to 27, coloured by persona score, with the steered neurons, their replies, and the direct links between the persona neurons.
+**[See where the neurons sit](https://sudarsh3301.github.io/one-neuron-is-all-you-need/map.html)**: a 3D map of 344,064 neurons (layers 0 to 27). Click a steered neuron to read its replies, or take the 9-stop tour. [How to read it.](#the-neuron-map)
 
 ![Steering one neuron makes Qwen3-8B speak as God: example replies, and how often it happens at each dose](docs/img/hero.png)
 
@@ -170,6 +170,56 @@ python analyze.py identify && python analyze.py judge2    # label the replies
 python analyze.py export                                  # results/v2/summary.json, best_picks.jsonl
 python plots_v2.py && python build_explorer_v2.py         # figures and the explorer page
 ```
+
+## The neuron map
+
+![The neuron map with the Yellow Emperor neuron L9.N598 open: its direct links drawn in 3D, and its replies in the side panel](docs/img/map.jpg)
+
+**[Open the map](https://sudarsh3301.github.io/one-neuron-is-all-you-need/map.html).** On the first visit it shows a short intro and a 9-stop tour of the results above.
+
+The map puts every neuron in this README into one picture, so you can see *where* in the model the persona neurons are.
+
+### What you see
+
+- **One sheet per layer.** Layers 0 to 27 run from left (input) to right (output). Layers 28–35 were not scanned. Each sheet holds the 12,288 MLP neurons of its layer, in index order. The position of a dot inside its sheet has no meaning.
+- **Blue and pink dots: the 7 steered neurons** of Results 1–4 and v2. Blue is a + dose, pink is a − dose. Click one to read its replies at each dose, with the label of each reply.
+- **Grey-blue dots: 50 tried neurons.** These are v2 screening candidates, with a few replies each and no labels. Most are in layers 19–27, and they left the model a plain assistant.
+- **Amber dots: persona score.** These are the top 500 neurons for the figure you pick at the top (Hitler, Yellow Emperor, Napoleon or Mao), from `align.py`. A brighter dot has a higher score. The bar chart at the bottom shows the best score in each layer.
+- **Lines: direct links.** They are off by default. A line from neuron A to a later neuron B means that A's output, fed straight into B's MLP, moves B strongly. Yellow: A pushes B up. Pink: A pushes B down.
+
+### How to use it
+
+1. Pick a figure at the top. The map colours its neurons by that figure's persona score.
+2. Click a dot, or a neuron in the side panel. The panel shows the dose bars, three replies, the persona score for all four figures, and the strongest links.
+3. Click a layer label or a bar to see one sheet face-on. Press Esc to go back.
+4. Type a neuron such as `L9 N598` in the search box.
+5. Share a view with its URL. The URL keeps the open neuron, the dose and the figure, for example [`map.html#n=L18.N7807&dose=32&fig=yellow_emperor`](https://sudarsh3301.github.io/one-neuron-is-all-you-need/map.html#n=L18.N7807&dose=32&fig=yellow_emperor).
+
+### What the links are, and what they are not
+
+The strength of a link from neuron A (layer i) to neuron B (layer j) is `(W_gate_j[B] · v) × (W_up_j[B] · v)`, where `v` is the `down_proj` column of A times the pre-MLP norm weight of layer j. It is a z-score against all 12,288 neurons on the other side. Code: `build_links.py`, after the method of neuron-explorer.
+
+- **It is read from the weights only.** It skips attention and every layer between A and B. So it ranks possible links. It does not measure an effect, and no link was tested by steering.
+- **Persona neurons link to each other more than random neurons do.** Of the pairs among the top 200 neurons of each figure, many more reach z ≥ 8 than pairs of random neurons from the same layers [measured, `check_links.py`]:
+
+| Figure | Top-200 pairs with z ≥ 8 | Random pairs with z ≥ 8 |
+|---|---|---|
+| Yellow Emperor | 3.2% | 0.10% |
+| Napoleon | 1.6% | 0.10% |
+| Hitler | 2.0% | 0.08% |
+| Mao | 3.9% | 0.07% |
+
+- **This is not proof of a circuit.** The persona score already prefers neurons that write along one shared direction, so they link more by construction. Mao has the densest links, but no Mao neuron worked.
+
+### Rebuild the map
+
+```
+python build_map.py     # docs/map_data.json: replies, labels and persona scores (needs results/v2 and vectors/personas/)
+python build_links.py   # docs/map_links.json: direct links (needs the bf16 shards and a CUDA GPU)
+python check_links.py   # adds the random-neuron comparison to docs/map_links.json
+```
+
+`docs/map.html` draws the data with `docs/map3d.js`, a 3D view taken from neuron-explorer. It needs WebGL and loads Three.js from jsDelivr.
 
 ## How it works
 
